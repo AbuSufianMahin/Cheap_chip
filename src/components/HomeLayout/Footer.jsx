@@ -1,9 +1,12 @@
 import React from "react";
+import ResponsiveWidth from "../shared/ResponsiveWidth";
 
 function Footer() {
   return (
     <footer>
-      <div className="max-w-7xl mx-auto border py-16">Footer content</div>
+      <ResponsiveWidth>
+        <div className="border py-16">Footer content</div>
+      </ResponsiveWidth>
     </footer>
   );
 }
