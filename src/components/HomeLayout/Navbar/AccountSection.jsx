@@ -4,7 +4,7 @@ import { FaUser } from "react-icons/fa";
 function AccountSection() {
   return (
     <div className="flex items-center gap-2">
-      <FaUser size={26} className="text-green-700"/>
+      <FaUser size={26} className="text-secondary"/>
       <div className="text-sm leading-tight">
         <h3 className="font-medium">Account</h3>
         <div className="space-x-1 text-xs">

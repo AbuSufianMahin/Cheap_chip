@@ -5,16 +5,17 @@ const alegreya = Alegreya({
   subsets: ["latin"],
 });
 
-function Logo({className}) {
+function Logo({imageClass, textClass, logoSize}) {
   return (
     <div className="flex gap-2 items-center">
       <Image
         src="/images/cheap_chip_3Dlogo.webp"
-        width={48}
-        height={48}
+        className={`${imageClass}`}
+        width={logoSize || 48}
+        height={logoSize || 48}
         alt="Logo of Cheap Chip"
       />
-      <h1 className={`${alegreya.className} text-center text-2xl font-extrabold leading-none`}>
+      <h1 className={`${alegreya.className} ${textClass} text-center text-2xl font-extrabold leading-none`}>
         Cheap
         <br />
         Chip
