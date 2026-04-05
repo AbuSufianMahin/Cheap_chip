@@ -35,7 +35,7 @@ function Login() {
                   required: "Email is required",
                   pattern: {
                     value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: "Enter a valid email",
+                    message: "Please enter a valid email",
                   },
                 })}
               />
@@ -58,11 +58,6 @@ function Login() {
                 placeholder="Enter Your Password"
                 {...register("password", {
                   required: "Password is required",
-                  pattern: {
-                    value: /^(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                    message:
-                      "Minimum 6 chars, include number & special character",
-                  },
                 })}
               />
               {errors.password && (
@@ -77,8 +72,8 @@ function Login() {
           </Field>
         </FieldGroup>
       </form>
-      <p>
-        Don't have an account? <Link href="register" className="underline hover:text-primary"> Register</Link> now!
+      <p className="text-sm md:text-md">
+        Don't have an account?{" "} <Link href="register" className="underline hover:text-primary"> Register</Link> now!
       </p>
     </div>
   );
