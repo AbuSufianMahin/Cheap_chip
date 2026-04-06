@@ -13,6 +13,7 @@ import { Input } from "../ui/input";
 function Footer() {
   const services = [
     { name: "Sell Device", path: "/our-services/sell-device" },
+    { name: "Track product", path: "/our-services/track-product" },
     { name: "Buy Refurbished", path: "/our-services/buy" },
     { name: "Recycling", path: "/our-services/recycling" },
     { name: "Device Collection", path: "/our-services/sell-device" },
@@ -28,17 +29,17 @@ function Footer() {
   return (
     <footer className="bg-primary text-white">
       <ResponsiveWidth>
-        <div className="py-16 grid xl:grid-cols-3 gap-8">
+        <div className="py-12 md:py-16 grid xl:grid-cols-3 gap-8 md:gap-14 xl:gap-24">
           <div className="space-y-4">
-            <div className="pb-4 border-b border-secondary/20 space-y-4">
+            <div className="pb-4 border-b border-secondary/20">
               <Logo logoSize={48} />
-              <p>
+              <p className="mt-4">
                 Sell old tech, recycle responsibly, and buy quality refurbished
                 devices. Simple, transparent, and eco-friendly.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-6 sm:gap-14">
+            <div className="flex flex-col xs:flex-row gap-4 xs:gap-14">
               <div>
                 <h4 className="text-secondary font-bold text-xl">Call Us</h4>
                 <p>+880 1234-567890</p>
@@ -52,7 +53,7 @@ function Footer() {
             </div>
           </div>
 
-          <div className="grid gap-8 xl:col-span-2 sm:grid-cols-2 md:grid-cols-3">
+          <div className="grid gap-8 xl:col-span-2 xs:grid-cols-2 md:grid-cols-3">
             <div className="flex-1">
               <h2 className="mb-4 text-2xl flex items-center gap-1 font-bold text-secondary">
                 <GrUserWorker className="" />
@@ -90,7 +91,7 @@ function Footer() {
             </div>
 
             <div className="flex-1 space-y-4">
-              <div className="w-5/6 md:w-full space-y-2">
+              <div className="w-full sm:w-8/10 lg:w-full space-y-2">
                 <h2 className="text-2xl flex items-center gap-1 font-bold text-secondary">
                   <MdSecurityUpdateGood />
                   <span>Get Updates</span>
