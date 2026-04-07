@@ -1,20 +1,49 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import GoogleLoginButton from "@/components/AuthLayout/GoogleLoginButton";
+import axiosPublic from "@/lib/axiosPublic";
 
-function page() {
+function registerPage() {
   const {
     handleSubmit,
     register,
     formState: { errors },
-    watch
+    watch,
   } = useForm();
 
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleRegister = async (data) => {
-    console.log(data);
+    try {
+
+      // console.log(data)
+      setIsLoading(true);
+
+      const { name, email, password } = data;
+
+      const res = await axiosPublic
+        .post("/api/authentication/register", { name, email, password })
+        .then((res) => {
+          console.log(res.data);
+        });
+    } catch (error) {
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -34,10 +63,12 @@ function page() {
             <div className="space-y-0.5">
               <Input
                 id="name"
-                placeholder="John Doe"
+                placeholder="Enter your name"
                 {...register("name", {
                   required: "Name is required",
                 })}
+                className={errors.name && "placeholder:text-red-500/70"}
+                aria-invalid={errors.name ? true : false}
               />
               {errors.name && (
                 <p className="text-red-500 text-xs ml-1 mt-1">
@@ -63,6 +94,8 @@ function page() {
                     message: "Enter a valid email",
                   },
                 })}
+                className={errors.email && "placeholder:text-red-500/70"}
+                aria-invalid={errors.email ? "true" : "false"}
               />
               {errors.email && (
                 <p className="text-red-500 text-xs ml-1 mt-1">
@@ -78,19 +111,38 @@ function page() {
               Password
             </FieldLabel>
             <div className="space-y-0.5">
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a password"
-                {...register("password", {
-                  required: "Password is required",
-                  pattern: {
-                    value: /^(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                    message:
-                      "Minimum 6 chars, include number & special character",
-                  },
-                })}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPass ? "text" : "password"}
+                  placeholder="Create a password"
+                  {...register("password", {
+                    required: "Password is required",
+                    pattern: {
+                      value: /^(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+                      message:
+                        "Minimum 6 chars, include number & special character",
+                    },
+                  })}
+                  className={errors.password && "placeholder:text-red-500/70"}
+                  aria-invalid={errors.password ? "true" : "false"}
+                />
+                <Button
+                  className={
+                    "absolute right-2 top-1/2 -translate-y-1/2 rounded-full"
+                  }
+                  variant="outline"
+                  type="button"
+                  size="sm"
+                  onClick={() => setShowPass(!showPass)}
+                >
+                  {showPass ? (
+                    <FaRegEyeSlash size={12} />
+                  ) : (
+                    <FaRegEye size={12} />
+                  )}
+                </Button>
+              </div>
               {errors.password && (
                 <p className="text-red-500 text-xs ml-1 mt-1">
                   {errors.password.message}
@@ -108,16 +160,35 @@ function page() {
               Confirm Password
             </FieldLabel>
             <div className="space-y-0.5">
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Re-enter your password"
-                {...register("confirmPassword", {
-                  required: "Please confirm your password",
-                  validate: (value) =>
-                    value === watch("password") || "Passwords do not match",
-                })}
-              />
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPass ? "text" : "password"}
+                  placeholder="Re-enter your password"
+                  {...register("confirmPassword", {
+                    required: "Please confirm your password",
+                    validate: (value) =>
+                      value === watch("password") || "Passwords do not match",
+                  })}
+                  className={errors.confirmPassword && "placeholder:text-red-500/70"}
+                  aria-invalid={errors.confirmPassword ? "true" : "false"}
+                />
+                <Button
+                  className={
+                    "absolute right-2 top-1/2 -translate-y-1/2 rounded-full"
+                  }
+                  variant="outline"
+                  type="button"
+                  size="sm"
+                  onClick={() => setShowConfirmPass(!showConfirmPass)}
+                >
+                  {showConfirmPass ? (
+                    <FaRegEyeSlash size={12} />
+                  ) : (
+                    <FaRegEye size={12} />
+                  )}
+                </Button>
+              </div>
               {errors.confirmPassword && (
                 <p className="text-red-500 text-xs ml-1 mt-1">
                   {errors.confirmPassword.message}
@@ -131,6 +202,10 @@ function page() {
             <Button type="submit">Register</Button>
           </Field>
         </FieldGroup>
+
+        <FieldSeparator className={"my-3"}>Or continue with</FieldSeparator>
+
+        <GoogleLoginButton isLoading = {isLoading}/>
       </form>
 
       <p className="text-sm md:text-md">
@@ -144,4 +219,4 @@ function page() {
   );
 }
 
-export default page;
+export default registerPage;

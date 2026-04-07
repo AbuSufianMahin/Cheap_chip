@@ -1,6 +1,4 @@
-import Navbar from "@/components/HomeLayout/Navbar/Navbar";
 import Logo from "@/components/shared/Logo";
-import NavbarLinks from "@/components/shared/NavbarLinks";
 import {
   Tooltip,
   TooltipContent,
@@ -44,6 +42,7 @@ function AuthLayout({ children }) {
               </TooltipContent>
             </Tooltip>
             <div className="w-full max-w-sm">{children}</div>
+
           </div>
         </div>
       </div>
