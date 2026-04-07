@@ -7,7 +7,7 @@ import NavbarLinks from "@/components/shared/NavbarLinks";
 function Navbar() {
   return (
     <nav
-      className="bg-primary text-white shadow-2xl shadow-primary/70 border-b-2 border-secondary"
+      className="bg-primary text-white border-b-2 border-secondary"
       aria-label="Homepage navigation"
     >
       <ResponsiveWidth>

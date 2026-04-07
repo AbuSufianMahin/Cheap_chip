@@ -1,9 +1,17 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import GoogleLoginButton from "@/components/AuthLayout/GoogleLoginButton";
 
 function Login() {
   const {
@@ -12,9 +20,12 @@ function Login() {
     formState: { errors },
   } = useForm();
 
+  const [showPass, setShowPass] = useState(false);
+
   const handleLogin = (data) => {
     console.log(data);
   };
+
   return (
     <div className="space-y-4 mt-5">
       <div className="text-center">
@@ -52,14 +63,31 @@ function Login() {
               Password
             </FieldLabel>
             <div className="space-y-0.5">
-              <Input
-                id="password"
-                type="password"
-                placeholder="Enter Your Password"
-                {...register("password", {
-                  required: "Password is required",
-                })}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPass ? "text" : "password"}
+                  placeholder="Enter Your Password"
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
+                />
+                <Button
+                  className={
+                    "absolute right-2 top-1/2 -translate-y-1/2 rounded-full"
+                  }
+                  variant="outline"
+                  type="button"
+                  size="sm"
+                  onClick={() => setShowPass(!showPass)}
+                >
+                  {showPass ? (
+                    <FaRegEyeSlash size={14} />
+                  ) : (
+                    <FaRegEye size={14} />
+                  )}
+                </Button>
+              </div>
               {errors.password && (
                 <p className="text-red-500 text-xs ml-1 mt-1">
                   {errors.password.message}
@@ -71,9 +99,18 @@ function Login() {
             <Button type="submit">Login</Button>
           </Field>
         </FieldGroup>
+
+        <FieldSeparator className={"my-3"}>Or continue with</FieldSeparator>
+        
+        <GoogleLoginButton/>
       </form>
       <p className="text-sm md:text-md">
-        Don't have an account?{" "} <Link href="register" className="underline hover:text-primary"> Register</Link> now!
+        Don't have an account?{" "}
+        <Link href="register" className="underline hover:text-primary">
+          {" "}
+          Register
+        </Link>{" "}
+        now!
       </p>
     </div>
   );

@@ -28,12 +28,7 @@ const updateProductLifeCycleByID = async (req, res) => {
 
     console.log(repairLog)
 
-    const result = await db
-      .collection("products")
-      .updateOne(
-        { _id: new ObjectId(productID) },
-        { $set: otherUpdates, $push: { repairLog: repairLog } },
-      );
+    const result = await db.collection("products").updateOne({ _id: new ObjectId(productID) },{ $set: otherUpdates, $push: { repairLog: repairLog } });
 
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: "Product not found" });
