@@ -5,7 +5,6 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./utils/db");
 
-
 const port = 1013;
 const app = express();
 
@@ -17,6 +16,8 @@ app.use(express.json());
 app.use(cors());
 
 // routes
+app.use("/api/auth", require("./routes/auth"));
+
 app.use("/api/riders-overview", require("./routes/ridersOverview"));
 app.use("/api/product-lifecycle", require("./routes/productLifecycle"));
 
