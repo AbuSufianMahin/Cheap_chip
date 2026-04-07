@@ -29,6 +29,8 @@ function registerPage() {
 
   const handleRegister = async (data) => {
     try {
+
+      // console.log(data)
       setIsLoading(true);
 
       const { name, email, password } = data;
@@ -40,6 +42,7 @@ function registerPage() {
         });
     } catch (error) {
     } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,7 +68,7 @@ function registerPage() {
                   required: "Name is required",
                 })}
                 className={errors.name && "placeholder:text-red-500/70"}
-                aria-invalid={errors.name ? "true" : "false"}
+                aria-invalid={errors.name ? true : false}
               />
               {errors.name && (
                 <p className="text-red-500 text-xs ml-1 mt-1">
@@ -202,7 +205,7 @@ function registerPage() {
 
         <FieldSeparator className={"my-3"}>Or continue with</FieldSeparator>
 
-        <GoogleLoginButton />
+        <GoogleLoginButton isLoading = {isLoading}/>
       </form>
 
       <p className="text-sm md:text-md">

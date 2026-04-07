@@ -23,7 +23,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
 
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
+      // console.log("SIGNIN CALLBACK →", { user, account, profile });
       return true;
     },
 
@@ -38,16 +39,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
 
-    async jwt({ token, user, account }) {
-      if (account?.provider === "google" && user?.email) {
+    async jwt({ token, user, account, trigger }) {
+      if (trigger === "signIn" && user?.email) {
         try {
-            const { db, client } = await connectDB();
+          const { db, client } = await connectDB();
 
           let userData = await db
             .collection("users")
             .findOne({ email: user.email });
 
           if (!userData) {
+            // new user
             const defaultImage = process.env.DEFAULT_USER_IMAGE;
             const role = "user";
             const roleAssignedBy = "system";
@@ -74,9 +76,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             const mongoClient = client.startSession();
             try {
               await mongoClient.withTransaction(async () => {
-                const userResult = await db.collection("users").insertOne(newUserData, { session:mongoClient });
-                await db.collection("credentials").insertOne(newUserCredentials, { session:mongoClient });
-                
+                const userResult = await db
+                  .collection("users")
+                  .insertOne(newUserData, { session: mongoClient });
+                await db
+                  .collection("credentials")
+                  .insertOne(newUserCredentials, { session: mongoClient });
+
                 // inserting _id added by mongoDB in newUserData
                 userData = { ...newUserData, _id: userResult.insertedId };
               });
@@ -92,19 +98,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.role = userData.role;
 
           return token;
-        } catch(error) {
+        } catch (error) {
           console.error("JWT callback DB error:", error);
           return token;
         }
       }
-
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.image = user.image;
-        token.role = user.role;
-      }
+      // if (user) {
+      //   token.id = user.id;
+      //   token.name = user.name;
+      //   token.email = user.email;
+      //   token.image = user.image;
+      //   token.role = user.role;
+      // }
       return token;
     },
   },

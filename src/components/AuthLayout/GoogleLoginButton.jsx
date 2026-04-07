@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
 
-function GoogleLoginButton() {
+function GoogleLoginButton({isLoading}) {
   const handleGoogleLogin = async () => {
     await signIn("google", { callbackUrl: "/home" });
   };
@@ -14,6 +14,7 @@ function GoogleLoginButton() {
       type="button"
       className="w-full"
       onClick={() => handleGoogleLogin()}
+      disabled={isLoading}
     >
       <FcGoogle />
       Continue with Google

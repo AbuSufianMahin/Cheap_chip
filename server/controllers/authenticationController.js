@@ -9,4 +9,5 @@ const registerWithCredentials = async (req, res) => {
     }
 }
 
+
 module.exports = {registerWithCredentials}
