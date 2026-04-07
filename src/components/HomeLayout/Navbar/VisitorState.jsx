@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link";
 import { FaUser } from "react-icons/fa";
 

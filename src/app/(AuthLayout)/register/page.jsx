@@ -45,7 +45,7 @@ function page() {
             <div className="space-y-0.5">
               <Input
                 id="name"
-                placeholder="John Doe"
+                placeholder="Enter your name"
                 {...register("name", {
                   required: "Name is required",
                 })}
