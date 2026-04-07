@@ -48,8 +48,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .findOne({ email: user.email });
 
           if (!userData) {
-            const defaultImage =
-              "https://res.cloudinary.com/dwmmarmfu/image/upload/default-cat-dp_j7fn6i.jpg";
+            const defaultImage = process.env.DEFAULT_USER_IMAGE;
             const role = "user";
             const roleAssignedBy = "system";
 

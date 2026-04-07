@@ -12,8 +12,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import GoogleLoginButton from "@/components/AuthLayout/GoogleLoginButton";
+import axiosPublic from "@/lib/axiosPublic";
 
-function page() {
+function registerPage() {
   const {
     handleSubmit,
     register,
@@ -24,8 +25,22 @@ function page() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleRegister = async (data) => {
-    console.log(data);
+    try {
+      setIsLoading(true);
+
+      const { name, email, password } = data;
+
+      const res = await axiosPublic
+        .post("/api/authentication/register", { name, email, password })
+        .then((res) => {
+          console.log(res.data);
+        });
+    } catch (error) {
+    } finally {
+    }
   };
 
   return (
@@ -49,6 +64,8 @@ function page() {
                 {...register("name", {
                   required: "Name is required",
                 })}
+                className={errors.name && "placeholder:text-red-500/70"}
+                aria-invalid={errors.name ? "true" : "false"}
               />
               {errors.name && (
                 <p className="text-red-500 text-xs ml-1 mt-1">
@@ -74,6 +91,8 @@ function page() {
                     message: "Enter a valid email",
                   },
                 })}
+                className={errors.email && "placeholder:text-red-500/70"}
+                aria-invalid={errors.email ? "true" : "false"}
               />
               {errors.email && (
                 <p className="text-red-500 text-xs ml-1 mt-1">
@@ -102,6 +121,8 @@ function page() {
                         "Minimum 6 chars, include number & special character",
                     },
                   })}
+                  className={errors.password && "placeholder:text-red-500/70"}
+                  aria-invalid={errors.password ? "true" : "false"}
                 />
                 <Button
                   className={
@@ -146,6 +167,8 @@ function page() {
                     validate: (value) =>
                       value === watch("password") || "Passwords do not match",
                   })}
+                  className={errors.confirmPassword && "placeholder:text-red-500/70"}
+                  aria-invalid={errors.confirmPassword ? "true" : "false"}
                 />
                 <Button
                   className={
@@ -193,4 +216,4 @@ function page() {
   );
 }
 
-export default page;
+export default registerPage;
