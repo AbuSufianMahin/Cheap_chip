@@ -92,7 +92,7 @@ function OurServices() {
           productName: data.productName,
           productCategory: data.productCategory,
           productCondition: data.productCondition,
-          productPrice: parseFloat(data.productPrice),
+          productPriceRange: data.productPriceRange,
           productDescription: data.productDescription,
           productImage: `data:${imageFile.type};base64,${base64Image}`, // Send as data URL
           productLocation: data.productLocation,
@@ -485,10 +485,10 @@ function OurServices() {
                     {errors.productCondition && <span className="text-red-500 text-sm font-medium">{errors.productCondition.message}</span>}
                   </div>
 
-                  {/* Price */}
+                  {/* Price Range */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="productPrice" className="text-lg font-semibold text-gray-700">Price (৳) *</Label>
+                      <Label htmlFor="productPriceRange" className="text-lg font-semibold text-gray-700">Price Range (৳) *</Label>
                       {selectedCategory && (
                         <button
                           type="button"
@@ -501,23 +501,38 @@ function OurServices() {
                       )}
                     </div>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black text-sm font-medium">৳</span>
-                      <Input
-                        id="productPrice"
-                        type="number"
-                        step="0.01"
-                        placeholder="0.00"
-                        {...register('productPrice', {
-                          required: 'Price is required',
-                          pattern: {
-                            value: /^\d+(\.\d{1,2})?$/,
-                            message: 'Please enter a valid price'
-                          }
+                      <select
+                        id="productPriceRange"
+                        {...register('productPriceRange', {
+                          required: 'Price range is required'
                         })}
-                        className="pl-6 py-3 px-4 border-2 border-green-200 rounded-xl focus:ring-green-500 focus:border-green-500 text-lg"
-                      />
+                        className="w-full py-3 px-4 border-2 border-green-200 rounded-xl focus:ring-green-500 focus:border-green-500 text-lg bg-white"
+                      >
+                        <option value="">Select Price Range</option>
+                        <option value="0-1000">৳0 - ৳1,000</option>
+                        <option value="1000-2000">৳1,000 - ৳2,000</option>
+                        <option value="2000-3000">৳2,000 - ৳3,000</option>
+                        <option value="3000-4000">৳3,000 - ৳4,000</option>
+                        <option value="4000-5000">৳4,000 - ৳5,000</option>
+                        <option value="5000-6000">৳5,000 - ৳6,000</option>
+                        <option value="6000-7000">৳6,000 - ৳7,000</option>
+                        <option value="7000-8000">৳7,000 - ৳8,000</option>
+                        <option value="8000-9000">৳8,000 - ৳9,000</option>
+                        <option value="9000-10000">৳9,000 - ৳10,000</option>
+                        <option value="10000-15000">৳10,000 - ৳15,000</option>
+                        <option value="15000-20000">৳15,000 - ৳20,000</option>
+                        <option value="20000-25000">৳20,000 - ৳25,000</option>
+                        <option value="25000-30000">৳25,000 - ৳30,000</option>
+                        <option value="30000-40000">৳30,000 - ৳40,000</option>
+                        <option value="40000-50000">৳40,000 - ৳50,000</option>
+                        <option value="50000-75000">৳50,000 - ৳75,000</option>
+                        <option value="75000-100000">৳75,000 - ৳1,00,000</option>
+                        <option value="100000-150000">৳1,00,000 - ৳1,50,000</option>
+                        <option value="150000-200000">৳1,50,000 - ৳2,00,000</option>
+                        <option value="200000+">৳2,00,000+</option>
+                      </select>
                     </div>
-                    {errors.productPrice && <span className="text-red-500 text-sm font-medium">{errors.productPrice.message}</span>}
+                    {errors.productPriceRange && <span className="text-red-500 text-sm font-medium">{errors.productPriceRange.message}</span>}
 
                     {/* Price Guide */}
                     {showPriceGuide && selectedCategory && (
