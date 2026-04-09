@@ -24,7 +24,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     async signIn({ user, account, profile }) {
-      // console.log("SIGNIN CALLBACK →", { user, account, profile });
       return true;
     },
 
@@ -44,9 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const { db, client } = await connectDB();
 
-          let userData = await db
-            .collection("users")
-            .findOne({ email: user.email });
+          let userData = await db.collection("users").findOne({ email: user.email });
 
           if (!userData) {
             // new user
@@ -103,13 +100,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return token;
         }
       }
-      // if (user) {
-      //   token.id = user.id;
-      //   token.name = user.name;
-      //   token.email = user.email;
-      //   token.image = user.image;
-      //   token.role = user.role;
-      // }
+
       return token;
     },
   },
