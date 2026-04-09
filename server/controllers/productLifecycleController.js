@@ -1,6 +1,57 @@
 const { ObjectId } = require("mongodb");
 const connectDB = require("../utils/db");
 
+const createProduct = async (req, res) => {
+  try {
+    const db = await connectDB();
+    const {
+      productName,
+      productCategory,
+      productCondition,
+      productPrice,
+      productDescription,
+      productImage,
+      productLocation,
+      productContactNumber,
+    } = req.body;
+
+    // Validate required fields
+    if (
+      !productName ||
+      !productCategory ||
+      !productCondition ||
+      !productPrice ||
+      !productLocation ||
+      !productContactNumber
+    ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const newProduct = {
+      productName,
+      productCategory,
+      productCondition,
+      productPrice,
+      productDescription: productDescription || "",
+      productImage: productImage || "",
+      productLocation,
+      productContactNumber,
+      createdAt: new Date(),
+      status: "active",
+      repairLog: [],
+    };
+
+    const result = await db.collection("products").insertOne(newProduct);
+
+    res.status(201).json({
+      message: "Product created successfully",
+      productID: result.insertedId,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const getProductLifecycleByID = async (req, res) => {
   try {
     const db = await connectDB();
@@ -40,4 +91,4 @@ const updateProductLifeCycleByID = async (req, res) => {
   }
 };
 
-module.exports = { getProductLifecycleByID, updateProductLifeCycleByID };
+module.exports = { createProduct, getProductLifecycleByID, updateProductLifeCycleByID };

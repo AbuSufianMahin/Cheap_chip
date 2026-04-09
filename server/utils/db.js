@@ -14,7 +14,7 @@ let db;
 
 async function connectDB() {
   if (db) {
-    return { client, db };
+    return { db, client };
   }
 
   if (!client) {
@@ -41,7 +41,7 @@ async function connectDB() {
   }
 
   db = client.db(process.env.DB_NAME);
-  return { client, db };
+  return { db, client };
 }
 
 module.exports = connectDB;
