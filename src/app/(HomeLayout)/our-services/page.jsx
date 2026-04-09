@@ -83,7 +83,7 @@ function OurServices() {
       // In a real application, you'd upload to a cloud storage service
       const base64Image = imagePreview.split(',')[1]; // Remove data:image/jpeg;base64, prefix
 
-      const response = await fetch('/api/products', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/product-lifecycle/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ function OurServices() {
           productCondition: data.productCondition,
           productPriceRange: data.productPriceRange,
           productDescription: data.productDescription,
-          productImage: `data:${imageFile.type};base64,${base64Image}`, // Send as data URL
+          productImage: `data:${imageFile.type};base64,${base64Image}`,
           productLocation: data.productLocation,
           productContactNumber: data.productContactNumber,
         }),
