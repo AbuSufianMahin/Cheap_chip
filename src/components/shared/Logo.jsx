@@ -6,7 +6,7 @@ const alegreya = Alegreya({
   subsets: ["latin"],
 });
 
-function Logo({ imageClass, textClass, logoSize }) {
+function Logo({ imageClass, textClass, logoSize, breakLine = true }) {
   return (
     <Link href="/">
       <div className="flex gap-2 items-center">
@@ -20,9 +20,7 @@ function Logo({ imageClass, textClass, logoSize }) {
         <h1
           className={`${alegreya.className} ${textClass} text-center text-2xl font-extrabold leading-none`}
         >
-          Cheap
-          <br />
-          Chip
+          Cheap {breakLine && <br />} Chip
         </h1>
       </div>
     </Link>

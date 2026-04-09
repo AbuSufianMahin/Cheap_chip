@@ -55,7 +55,7 @@ function OurServices() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-white via-green-50 to-green-100 py-12 px-4">
+    <div className="min-h-screen w-full bg-linear-to-br from-white via-green-50 to-green-100 py-12 px-4">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -z-10"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -z-10"></div>
@@ -63,7 +63,7 @@ function OurServices() {
       <div className="w-full max-w-2xl mx-auto">
         {/* Header Section */}
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold mb-3 bg-linear-to-rrom-green-600 to-green-800 bg-clip-text text-transparent">
             Create Your Sell Post
           </h1>
           <p className="text-lg text-gray-600 leading-relaxed">
@@ -74,14 +74,14 @@ function OurServices() {
         {/* Form Container */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 bg-white p-8 rounded-2xl shadow-2xl backdrop-blur-sm border border-green-100">
           {successMessage && (
-            <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 border border-green-300 text-green-700 rounded-lg flex items-center gap-2">
+            <div className="p-4 bg-linear-to-r from-green-50 to-green-100 border border-green-300 text-green-700 rounded-lg flex items-center gap-2">
               <span className="text-xl">✓</span>
               <span className="font-semibold">{successMessage}</span>
             </div>
           )}
 
           {errorMessage && (
-            <div className="p-4 bg-gradient-to-r from-red-50 to-red-100 border border-red-300 text-red-700 rounded-lg flex items-center gap-2">
+            <div className="p-4 bg-linear-to-r from-red-50 to-red-100 border border-red-300 text-red-700 rounded-lg flex items-center gap-2">
               <span className="text-xl">✕</span>
               <span className="font-semibold">{errorMessage}</span>
             </div>
@@ -210,7 +210,7 @@ function OurServices() {
           <Button 
             type="submit" 
             disabled={loading}
-            className="w-full h-12 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-lg rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+            className="w-full h-12 bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-lg rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
             {loading ? (
               <div className="flex items-center gap-2">
