@@ -40,8 +40,13 @@ async function connectDB() {
     }
   }
 
-  db = client.db(process.env.DB_NAME);
-  return { client, db };
+  const dbName = process.env.DB_NAME;
+  if (!dbName) {
+    throw new Error("DB_NAME is not set");
+  }
+
+  db = client.db(dbName);
+  return db;
 }
 
 module.exports = connectDB;
