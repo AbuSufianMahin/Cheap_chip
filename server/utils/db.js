@@ -22,7 +22,6 @@ async function connectDB() {
     if (!uri) {
       throw new Error("MONGODB_URI is not set");
     }
-    console.log("URI loaded:", !!uri, "| DB:", process.env.DB_NAME);
     client = new MongoClient(uri, {
       serverApi: {
         version: ServerApiVersion.v1,

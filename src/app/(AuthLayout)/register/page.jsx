@@ -13,6 +13,8 @@ import { useForm } from "react-hook-form";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import GoogleLoginButton from "@/components/AuthLayout/GoogleLoginButton";
 import axiosPublic from "@/lib/axiosPublic";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 function registerPage() {
   const {
@@ -29,18 +31,39 @@ function registerPage() {
 
   const handleRegister = async (data) => {
     try {
-
-      // console.log(data)
       setIsLoading(true);
 
       const { name, email, password } = data;
 
-      const res = await axiosPublic
-        .post("/api/authentication/register", { name, email, password })
-        .then((res) => {
-          console.log(res.data);
-        });
+      const res = await axiosPublic.post("/api/authentication/register", { name, email, password});
+      console.log(res.data);
+
     } catch (error) {
+      if (error.response) {
+        const { status, data } = error.response;
+
+        if (status === 409) {
+          // Handling your custom backend error codes
+          if (data.code === "ACCOUNT_EXISTS_GOOGLE_ONLY") {
+            toast.error("This email is linked to Google. Please sign in with Google.",
+            );
+          } else {
+            toast.error(data.message || "Email already in use.");
+          }
+
+        }
+        else if(status === 429){
+          if (data.code === "TOO_MANY_REQUESTS"){
+            toast.warning(data.message || "Too many requests. Please try again later");
+          }
+        
+        } else {
+          toast.error("Something went wrong on the server.");
+        }
+      } else {
+        toast.error("Network error. Please check your connection.");
+      }
+
     } finally {
       setIsLoading(false);
     }
@@ -170,7 +193,9 @@ function registerPage() {
                     validate: (value) =>
                       value === watch("password") || "Passwords do not match",
                   })}
-                  className={errors.confirmPassword && "placeholder:text-red-500/70"}
+                  className={
+                    errors.confirmPassword && "placeholder:text-red-500/70"
+                  }
                   aria-invalid={errors.confirmPassword ? "true" : "false"}
                 />
                 <Button
@@ -199,13 +224,13 @@ function registerPage() {
 
           {/* Submit */}
           <Field>
-            <Button type="submit">Register</Button>
+            <Button type="submit"  disabled={isLoading}>Register {isLoading && <Spinner/>} </Button>
           </Field>
         </FieldGroup>
 
         <FieldSeparator className={"my-3"}>Or continue with</FieldSeparator>
 
-        <GoogleLoginButton isLoading = {isLoading}/>
+        <GoogleLoginButton isLoading={isLoading} setIsLoading={setIsLoading}/>
       </form>
 
       <p className="text-sm md:text-md">

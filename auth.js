@@ -61,6 +61,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               roleAssignedBy,
               createdAt: now,
               updatedAt: now,
+              passwordChangedAt: null
             };
 
             const newUserCredentials = {
