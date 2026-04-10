@@ -42,10 +42,10 @@ function AuthLayout({ children }) {
               </TooltipContent>
             </Tooltip>
             <div className="w-full max-w-sm">{children}</div>
-
           </div>
         </div>
       </div>
+      
     </div>
   );
 }

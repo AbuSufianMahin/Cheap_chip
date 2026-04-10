@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 import React from "react";
 
 function getInitials(fullName = "") {
@@ -22,6 +23,7 @@ function getInitials(fullName = "") {
 function MemberState({ userInfo }) {
   const { name, email, image } = userInfo;
   const initials = getInitials(name);
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -35,7 +37,7 @@ function MemberState({ userInfo }) {
       <DropdownMenuContent className="w-32">
         <DropdownMenuGroup>
           <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>Billing</DropdownMenuItem>
+          <Link href={"/dashboard"}><DropdownMenuItem>Dashboard</DropdownMenuItem></Link>
           <DropdownMenuItem>Settings</DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

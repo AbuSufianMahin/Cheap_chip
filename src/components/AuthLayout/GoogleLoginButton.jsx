@@ -2,10 +2,20 @@ import React from "react";
 import { Button } from "../ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 
-function GoogleLoginButton({isLoading}) {
+function GoogleLoginButton({ isLoading, setIsLoading }) {
   const handleGoogleLogin = async () => {
-    await signIn("google", { callbackUrl: "/home" });
+    setIsLoading(true);
+    const result = await signIn("google", {
+      callbackUrl: "/home",
+      redirect: true,
+    });
+
+    if (result?.error) {
+      toast.error("Google login failed. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (

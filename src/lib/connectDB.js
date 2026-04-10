@@ -1,5 +1,14 @@
-const dns = require("dns");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+import { MongoClient, ServerApiVersion } from "mongodb";
+
+// Node's default resolver fails SRV lookup in some networks; allow override via env.
+import dns from "dns";
+
+dns.setServers(
+  process.env.DNS_SERVERS?.split(",").map((server) => server.trim()) || [
+    "8.8.8.8",
+    "1.1.1.1",
+  ],
+);
 
 let client;
 let db;
@@ -14,19 +23,18 @@ async function connectDB() {
     if (!uri) {
       throw new Error("MONGODB_URI is not set");
     }
+
     client = new MongoClient(uri, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
       },
-      tls: true,
-      tlsAllowInvalidCertificates: false,
     });
 
     try {
       await client.connect();
-      console.log("Cheap_chip MongoDB connected");
+      console.log("Cheap_chip MongoDB connected (API)");
     } catch (err) {
       console.log("MongoDB connection error:", err);
       throw err;
@@ -37,4 +45,4 @@ async function connectDB() {
   return { db, client };
 }
 
-module.exports = connectDB;
+export default connectDB;
