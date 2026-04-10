@@ -20,7 +20,8 @@ app.use("/api/authentication", require("./routes/authentication"));
 
 app.use("/api/riders-overview", require("./routes/ridersOverview"));
 app.use("/api/product-lifecycle", require("./routes/productLifecycle"));
-
+// Job application apis
+app.use('/api/job-applications', require("./routes/jobapplication"));
 app.get("/", (req, res) => {
   res.send("Running cheap chip server!");
 });
