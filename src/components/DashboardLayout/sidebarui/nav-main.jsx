@@ -27,10 +27,10 @@ export function NavMain({navItems}) {
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title} className="shadow">
-                <Link href={item.url} >
+                <div>
                   <item.icon />
                   <span className="text-base">{item.title}</span>
-                </Link>
+                </div>
               </SidebarMenuButton>
               {item.items?.length ? (
                 <>
@@ -45,9 +45,9 @@ export function NavMain({navItems}) {
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
+                            <Link href={subItem.url}>
                               <span>{subItem.title}</span>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}
