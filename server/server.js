@@ -6,8 +6,10 @@ const cors = require("cors");
 const connectDB = require("./utils/db");
 const rateLimit = require("express-rate-limit");
 
-const port = 5000;
+const port = process.env.PORT || 5000;
 const app = express();
+
+app.set('trust proxy', 1);
 
 // MongoDB connection
 connectDB();

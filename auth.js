@@ -24,6 +24,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     async signIn({ user, account, profile }) {
+
+      // =*=*=*=*=*=*=*=*=*=* PROVIDERS LINKING LOGIC (DON'T DELETE) =*=*=*=*=*=*=*=*=*=*
+
+      // if (account?.provider === "google") {
+      //   const { db } = await connectDB();
+
+      //   const existing = await db.collection("credentials").findOne({ email: user.email });
+
+      //   const isCredentialsOnly = existing?.providers?.length === 1 && existing.providers[0] === "credentials";
+      //   const isGoogleOnly = existing?.providers?.length === 1 && existing.providers[0] === "google";
+
+      //   if (isCredentialsOnly) {
+      //     return `/login?email=${encodeURIComponent(user.email)}&provider=google`;
+      //   }
+
+      //   if (isGoogleOnly) {
+      //     return `/home?email=${encodeURIComponent(user.email)}&provider=credentials`;
+      //   }
+        
+      // }
       return true;
     },
 
@@ -42,10 +62,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (trigger === "signIn" && user?.email) {
         try {
           const { db, client } = await connectDB();
+          let userData = await db
+            .collection("users")
+            .findOne({ email: user.email });
 
-          let userData = await db.collection("users").findOne({ email: user.email });
+          if (userData) {
+            
+            // =*=*=*=*=*=*=*=*=*=* PROVIDERS LINKING LOGIC (DON'T DELETE) =*=*=*=*=*=*=*=*=*=*
 
-          if (!userData) {
+            // if ( existingUser.providers?.length === 1 && existingUser.providers[0] === "credentials") {
+            //   token._linkingRequired = true;
+            //   token._linkingEmail = user.email;
+            //   token._linkingProvider = "google";
+              
+            //   return token;
+            // }
+          } else {
             // new user
             const defaultImage = process.env.DEFAULT_USER_IMAGE;
             const role = "user";
@@ -60,8 +92,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               role,
               roleAssignedBy,
               createdAt: now,
-              updatedAt: now,
-              passwordChangedAt: null
+              lastLoginAt: null,
             };
 
             const newUserCredentials = {

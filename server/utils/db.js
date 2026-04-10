@@ -1,14 +1,6 @@
 const dns = require("dns");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
-// Node's default resolver fails SRV lookup in some networks; allow override via env.
-dns.setServers(
-  process.env.DNS_SERVERS?.split(",").map((server) => server.trim()) || [
-    "8.8.8.8",
-    "1.1.1.1",
-  ],
-);
-
 let client;
 let db;
 
