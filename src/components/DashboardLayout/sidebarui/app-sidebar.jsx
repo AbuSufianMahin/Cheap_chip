@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, Bot, LifeBuoy, Settings2, Shield, SquareTerminal, Truck, User, Wrench } from "lucide-react";
+import { LifeBuoy, Shield, Truck, User, Wrench } from "lucide-react";
 
 import {
   Sidebar,
@@ -97,28 +97,24 @@ const navMain = [
     icon: Shield,
     items: [
       {
-        title: "Dashboard / Insights",
-        url: "/admin/dashboard",
-      },
-      {
         title: "Manage Users",
         url: "/admin/users",
       },
       {
+        title: "Manage Deliveryman",
+        url: "/admin/manage-deliveryman",
+      },
+      {
         title: "Manage Technicians",
-        url: "/admin/technicians",
+        url: "/admin/manage-technicians",
       },
       {
-        title: "Manage Delivery Team",
-        url: "/admin/delivery",
-      },
-      {
-        title: "Track All Products",
-        url: "/admin/products",
+        title: "Track Products",
+        url: "/admin/track-products",
       },
       {
         title: "Reports & Analytics",
-        url: "/admin/reports",
+        url: "/admin/reports-and-analytics",
       },
     ],
   },
