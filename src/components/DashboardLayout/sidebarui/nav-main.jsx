@@ -36,7 +36,7 @@ export function NavMain({ navItems }) {
                 <SidebarMenuButton
                   asChild
                   tooltip={item.title}
-                  className={hasActiveChild ? "bg-gray-300" : "shadow"}
+                  className={`${hasActiveChild ? "bg-gray-300" : ""} shadow hover:bg-gray-300 cursor-pointer`}
                 >
                   <div>
                     <item.icon />
@@ -50,7 +50,7 @@ export function NavMain({ navItems }) {
                         <ChevronRight />
                       </SidebarMenuAction>
                     </CollapsibleTrigger>
-                    <CollapsibleContent>
+                    <CollapsibleContent className="mt-2">
                       <SidebarMenuSub>
                         {item.items?.map((subItem) => {
                           const isActiveSubItem = isRouteActive(subItem.url)
@@ -59,7 +59,7 @@ export function NavMain({ navItems }) {
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
                                 asChild
-                                className={isActiveSubItem ? "bg-gray-200" : ""}
+                                className={` ${isActiveSubItem ? "bg-gray-200" : ""} hover:bg-gray-200`}
                               >
                                 <Link href={subItem.url}>
                                   <span>{subItem.title}</span>

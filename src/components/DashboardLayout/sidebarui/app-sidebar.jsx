@@ -26,23 +26,15 @@ const navMain = [
     items: [
       {
         title: "My Peripherals",
-        url: "/user/peripherals",
+        url: "/dashboard/user/peripherals",
       },
       {
         title: "Track Products",
-        url: "/user/orders",
-      },
-      {
-        title: "Request Repair",
-        url: "/user/request-repair",
-      },
-      {
-        title: "Sell Item",
-        url: "/user/sell",
+        url: "/dashboard/user/orders",
       },
       {
         title: "Payment History",
-        url: "/user/payments",
+        url: "/dashboard/user/payments",
       },
     ],
   },
@@ -54,19 +46,19 @@ const navMain = [
     items: [
       {
         title: "Assigned Products",
-        url: "/technician/assigned",
+        url: "/dashboard/technician/assigned",
       },
       {
         title: "In Progress",
-        url: "/technician/in-progress",
+        url: "/dashboard/technician/in-progress",
       },
       {
         title: "Completed Jobs",
-        url: "/technician/completed",
+        url: "/dashboard/technician/completed",
       },
       {
         title: "Report Issue",
-        url: "/technician/report",
+        url: "/dashboard/technician/report",
       },
     ],
   },
@@ -78,15 +70,15 @@ const navMain = [
     items: [
       {
         title: "Assigned Deliveries",
-        url: "/delivery/assigned",
+        url: "/dashboard/delivery/assigned",
       },
       {
         title: "All Deliveries",
-        url: "/delivery/all",
+        url: "/dashboard/delivery/all",
       },
       {
         title: "Delivery Status Update",
-        url: "/delivery/status",
+        url: "/dashboard/delivery/status",
       },
     ],
   },
@@ -97,24 +89,24 @@ const navMain = [
     icon: Shield,
     items: [
       {
-        title: "Manage Users",
-        url: "/admin/users",
+        title: "User management",
+        url: "/dashboard/admin/user-management",
       },
       {
         title: "Manage Deliveryman",
-        url: "/admin/manage-deliveryman",
+        url: "/dashboard/admin/manage-deliveryman",
       },
       {
         title: "Manage Technicians",
-        url: "/admin/manage-technicians",
+        url: "/dashboard/admin/manage-technicians",
       },
       {
-        title: "Track Products",
-        url: "/admin/track-products",
+        title: "Product Management",
+        url: "/dashboard/admin/product-management",
       },
       {
         title: "Reports & Analytics",
-        url: "/admin/reports-and-analytics",
+        url: "/dashboard/admin/reports-and-analytics",
       },
     ],
   },
@@ -142,7 +134,6 @@ const navMain = [
 
 export function AppSidebar({ ...props }) {
   const { data, status } = useSession();
-  console.log("Status", status);
 
   return (
     <Sidebar variant="inset" {...props}>

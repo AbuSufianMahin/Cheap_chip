@@ -1,4 +1,3 @@
-const dns = require("dns");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
 let client;
