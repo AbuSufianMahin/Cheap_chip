@@ -49,6 +49,8 @@ app.use("/api/deliverymen", require("./routes/deliveryman"))
 // product apis
 app.use("/api/product-lifecycle", require("./routes/productLifecycle"));
 app.use("/api/admin", require("./routes/adminApplications"));
+app.use("/api/products-info", require("./routes/allProducts"));
+
 // Job application apis
 app.use('/api/job-applications', require("./routes/jobapplication"));
 
