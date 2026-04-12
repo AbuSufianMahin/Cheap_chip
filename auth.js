@@ -1,6 +1,22 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import connectDB from "./server/utils/db";
+import getApprovedRoleForEmail from "./server/utils/approvedRole";
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+async function findUserByEmail(db, email) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const escapedEmail = escapeRegex(normalizedEmail);
+
+  return db.collection("users").findOne({
+    email: {
+      $regex: new RegExp(`^${escapedEmail}$`, "i"),
+    },
+  });
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
@@ -62,11 +78,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (trigger === "signIn" && user?.email) {
         try {
           const { db, client } = await connectDB();
-          let userData = await db
-            .collection("users")
-            .findOne({ email: user.email });
+          const normalizedEmail = user.email.trim().toLowerCase();
+          const approvedRole = await getApprovedRoleForEmail(db, normalizedEmail);
+          let userData = await findUserByEmail(db, normalizedEmail);
 
           if (userData) {
+            if (approvedRole && userData.role !== approvedRole) {
+              await db.collection("users").updateOne(
+                { _id: userData._id },
+                {
+                  $set: {
+                    role: approvedRole,
+                    roleAssignedBy: "application-approval",
+                  },
+                },
+              );
+
+              userData = {
+                ...userData,
+                role: approvedRole,
+                roleAssignedBy: "application-approval",
+              };
+            }
             
             // =*=*=*=*=*=*=*=*=*=* PROVIDERS LINKING LOGIC (DON'T DELETE) =*=*=*=*=*=*=*=*=*=*
 
@@ -80,14 +113,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           } else {
             // new user
             const defaultImage = process.env.DEFAULT_USER_IMAGE;
-            const role = "user";
-            const roleAssignedBy = "system";
+            const role = approvedRole || "user";
+            const roleAssignedBy = approvedRole ? "application-approval" : "system";
 
             const now = new Date();
 
             const newUserData = {
               name: user.name,
-              email: user.email,
+              email: normalizedEmail,
               image: user.image || defaultImage,
               role,
               roleAssignedBy,
@@ -96,7 +129,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             };
 
             const newUserCredentials = {
-              email: user.email,
+              email: normalizedEmail,
               providers: ["google"],
               hashedPassword: null,
               passwordChangedAt: null,
