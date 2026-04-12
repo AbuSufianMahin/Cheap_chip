@@ -40,11 +40,18 @@ const spamController = rateLimit({
 // routes
 app.use("/api/authentication", spamController, require("./routes/authentication"));
 
+// riders (deliveryman) apis
 app.use("/api/riders-overview", require("./routes/ridersOverview"));
+
+app.use("/api/deliverymen", require("./routes/deliveryman"))
+
+
+// product apis
 app.use("/api/product-lifecycle", require("./routes/productLifecycle"));
 app.use("/api/admin", require("./routes/adminApplications"));
 // Job application apis
 app.use('/api/job-applications', require("./routes/jobapplication"));
+
 app.get("/", (req, res) => {
   res.send("Running cheap chip server!");
 });
