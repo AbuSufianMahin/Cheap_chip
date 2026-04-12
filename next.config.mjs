@@ -13,6 +13,9 @@ const nextConfig = {
       },
     ],
   },
+  turbopack: {
+    root: "/Users/abhijitsarkar/Documents/GitHub/Cheap_chip",
+  },
 };
 
 export default nextConfig;
