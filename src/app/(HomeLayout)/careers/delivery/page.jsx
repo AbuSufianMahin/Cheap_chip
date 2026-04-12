@@ -22,6 +22,7 @@ function DeliveryApplication() {
       const drivingLicenseFile = data.drivingLicensePicture?.[0]
       const payload = {
         name: data.name,
+        email: data.email,
         location: data.location,
         mobileNumber: data.mobileNumber,
         drivingLicense: data.drivingLicense,
@@ -29,7 +30,7 @@ function DeliveryApplication() {
         drivingLicensePicture: drivingLicenseFile ? await fileToBase64(drivingLicenseFile) : null,
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/job-applications/delivery`, {
+      const response = await fetch('/api/job-applications/delivery', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +42,8 @@ function DeliveryApplication() {
         alert('Application submitted successfully!')
         router.push('/careers')
       } else {
-        alert('Failed to submit application. Please try again.')
+        const errorData = await response.json().catch(() => ({}))
+        alert(errorData?.message || 'Failed to submit application. Please try again.')
       }
     } catch (error) {
       console.error('Error submitting application:', error)
@@ -79,6 +81,24 @@ function DeliveryApplication() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
               />
               {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location.message}</p>}
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                Email Address
+              </label>
+              <input
+                {...register('email', {
+                  required: 'Email is required',
+                  pattern: {
+                    value: /^\S+@\S+\.\S+$/,
+                    message: 'Please enter a valid email address',
+                  },
+                })}
+                type="email"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+              />
+              {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
             </div>
 
             <div>

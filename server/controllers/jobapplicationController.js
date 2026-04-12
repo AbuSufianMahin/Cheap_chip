@@ -1,4 +1,3 @@
-const { ObjectId } = require("mongodb");
 const connectDB = require("../utils/db");
 
 const applyfordeliveryman = async (req, res) => {
@@ -6,6 +5,7 @@ const applyfordeliveryman = async (req, res) => {
     const { db } = await connectDB();
     const {
       name,
+      email,
       location,
       mobileNumber,
       drivingLicense,
@@ -14,12 +14,15 @@ const applyfordeliveryman = async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!name || !location || !mobileNumber || !drivingLicense || !idProof) {
+    if (!name || !email || !location || !mobileNumber || !drivingLicense || !idProof) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     const newApplication = {
       name,
+      email: normalizedEmail,
       location,
       mobileNumber,
       drivingLicense,
@@ -46,6 +49,7 @@ const applyfortechnician = async (req, res) => {
     const { db } = await connectDB();
     const {
       name,
+      email,
       location,
       mobileNumber,
       skills,
@@ -55,12 +59,15 @@ const applyfortechnician = async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!name || !location || !mobileNumber || !skills || !certificates || !idProof) {
+    if (!name || !email || !location || !mobileNumber || !skills || !certificates || !idProof) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     const newApplication = {
       name,
+      email: normalizedEmail,
       location,
       mobileNumber,
       skills,
@@ -83,4 +90,7 @@ const applyfortechnician = async (req, res) => {
   }
 };
 
-module.exports = {applyfordeliveryman, applyfortechnician}
+module.exports = {
+  applyfordeliveryman,
+  applyfortechnician,
+};

@@ -89,7 +89,10 @@ const navMain = [
     icon: Shield,
     items: [
       {
-        title: "User management",
+        title: "Applications Review",
+        url: "/admin/applications",
+      },
+      { title: "User management",
         url: "/dashboard/admin/user-management",
       },
       {
@@ -134,6 +137,8 @@ const navMain = [
 
 export function AppSidebar({ ...props }) {
   const { data, status } = useSession();
+  const isAdmin = data?.user?.role === "admin";
+  const visibleNavItems = navMain.filter((section) => section.title !== "Admin Panel" || isAdmin);
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -154,11 +159,11 @@ export function AppSidebar({ ...props }) {
       ) : (
         <>
           <SidebarContent>
-            <NavMain navItems={navMain} />
+            <NavMain navItems={visibleNavItems} />
           </SidebarContent>
 
           <SidebarFooter className={"border-t"}>
-            <NavUser user={data.user} />
+            {data?.user ? <NavUser user={data.user} /> : null}
           </SidebarFooter>
         </>
       )}
