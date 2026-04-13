@@ -13,7 +13,7 @@ function OurServices() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-green-50 to-emerald-100 relative overflow-hidden">
+    <div className="min-h-screen bg-linear-to-br from-white via-green-50 to-emerald-100 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
@@ -40,7 +40,7 @@ function OurServices() {
               Welcome to Cheap Chip Marketplace
             </div>
 
-            <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-green-600 via-emerald-600 to-green-800 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-6xl font-bold mb-6 bg-linear-to-rrom-green-600 via-emerald-600 to-green-800 bg-clip-text text-transparent leading-tight">
               What brings you here today?
             </h1>
 
@@ -57,7 +57,7 @@ function OurServices() {
               <div className="group cursor-pointer" onClick={() => setUserType('buyer')}>
                 <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-green-200 p-8 md:p-12 hover:border-green-400 hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105">
                   <div className="text-center">
-                    <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-20 h-20 bg-linear-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                       <ShoppingCart className="w-10 h-10 text-white" />
                     </div>
 
@@ -82,7 +82,7 @@ function OurServices() {
                       </div>
                     </div>
 
-                    <Button className="w-full py-4 text-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-blue-500/25">
+                    <Button className="w-full py-4 text-lg bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-blue-500/25">
                       Start Shopping 🛒
                     </Button>
                   </div>
@@ -93,7 +93,7 @@ function OurServices() {
               <div className="group cursor-pointer" onClick={() => setUserType('seller')}>
                 <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-green-200 p-8 md:p-12 hover:border-green-400 hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105">
                   <div className="text-center">
-                    <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <div className="w-20 h-20 bg-linear-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                       <Store className="w-10 h-10 text-white" />
                     </div>
 
@@ -118,13 +118,8 @@ function OurServices() {
                       </div>
                     </div>
 
-                    <Button 
-                      className="w-full py-4 text-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-green-500/25"
-                      asChild
-                    >
-                      <Link href="/our-services/create-sell-post">
-                        Start Selling 💰
-                      </Link>
+                    <Button className="w-full py-4 text-lg bg-linear-to-rrom-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-green-500/25">
+                      Start Selling 💰
                     </Button>
                   </div>
                 </div>
@@ -166,7 +161,7 @@ function OurServices() {
 
             {/* Buyer Hero */}
             <div className="text-center mb-12">
-              <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+              <h1 className="text-5xl font-bold mb-6 bg-linear-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                 Find Your Perfect Computer Chips
               </h1>
               <p className="text-xl text-gray-600 mb-8">
@@ -220,7 +215,7 @@ function OurServices() {
                 {/* Sample Product Cards */}
                 {[1, 2, 3, 4, 5, 6].map((item) => (
                   <div key={item} className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    <div className="h-48 bg-gradient-to-r from-green-100 to-blue-100 flex items-center justify-center">
+                    <div className="h-48 bg-linear-to-rrom-green-100 to-blue-100 flex items-center justify-center">
                       <span className="text-6xl">🔧</span>
                     </div>
                     <div className="p-6">
@@ -239,10 +234,10 @@ function OurServices() {
             </div>
 
             {/* Call to Action */}
-            <div className="text-center bg-gradient-to-r from-blue-50 to-green-50 rounded-3xl p-12">
+            <div className="text-center bg-linear-to-r from-blue-50 to-green-50 rounded-3xl p-12">
               <h3 className="text-3xl font-bold mb-4">Ready to find your perfect chips?</h3>
               <p className="text-gray-600 mb-6">Join thousands of satisfied buyers who found exactly what they needed</p>
-              <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-4 text-lg rounded-2xl shadow-lg">
+              <Button className="bg-linear-to-rrom-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-4 text-lg rounded-2xl shadow-lg">
                 Browse All Listings 🛒
               </Button>
             </div>
