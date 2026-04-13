@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 
 const registerWithCredentials = async (req, res) => {
   try {
-    const { db, client } = await connectDB();
+    const db = await connectDB();
     const { name, email, password } = req.body;
     const existingUser = await db.collection("credentials").findOne({ email });
 
@@ -42,32 +42,22 @@ const registerWithCredentials = async (req, res) => {
         lastLoginAt: null,
       };
 
-      const mongoSession = client.startSession();
-      let userId;
+      // Create credentials document
+      await db
+        .collection("credentials")
+        .insertOne(newUserCredentials);
 
-      try {
-        await mongoSession.withTransaction(async () => {
-          await db
-            .collection("credentials")
-            .insertOne(newUserCredentials, { session: mongoSession });
+      // Create user details document
+      const newUserResult = await db
+        .collection("users")
+        .insertOne(newUserDetails);
+      
+      const userId = newUserResult.insertedId;
 
-          const newUserResult = await db
-            .collection("users")
-            .insertOne(newUserDetails, { session: mongoSession });
-          
-          userId= newUserResult.insertedId;
-        });
-
-        return res.status(201).json({
-          message: "Account created successfully",
-          userId
-        });
-
-      } catch (error) {
-        throw error;
-      } finally {
-        await mongoSession.endSession();
-      }
+      return res.status(201).json({
+        message: "Account created successfully",
+        userId
+      });
     }
   } catch (error) {
     console.error(error);

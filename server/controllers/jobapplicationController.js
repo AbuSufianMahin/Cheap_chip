@@ -3,7 +3,7 @@ const connectDB = require("../utils/db");
 
 const applyfordeliveryman = async (req, res) => {
   try {
-    const { db } = await connectDB();
+    const db = await connectDB();
     const {
       name,
       location,
@@ -43,7 +43,7 @@ const applyfordeliveryman = async (req, res) => {
 
 const applyfortechnician = async (req, res) => {
   try {
-    const { db } = await connectDB();
+    const db = await connectDB();
     const {
       name,
       location,

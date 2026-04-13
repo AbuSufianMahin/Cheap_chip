@@ -190,8 +190,13 @@ function OurServices() {
                       </div>
                     </div>
 
-                    <Button className="w-full py-4 text-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-blue-500/25">
-                      Start Shopping 🛒
+                    <Button
+                      className="w-full py-4 text-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                      asChild
+                    >
+                      <Link href="/our-services/buy-products">
+                        Start Shopping 🛒
+                      </Link>
                     </Button>
                   </div>
                 </div>
@@ -345,8 +350,10 @@ function OurServices() {
             <div className="text-center bg-gradient-to-r from-blue-50 to-green-50 rounded-3xl p-12">
               <h3 className="text-3xl font-bold mb-4">Ready to find your perfect chips?</h3>
               <p className="text-gray-600 mb-6">Join thousands of satisfied buyers who found exactly what they needed</p>
-              <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-4 text-lg rounded-2xl shadow-lg">
-                Browse All Listings 🛒
+              <Button asChild className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-4 text-lg rounded-2xl shadow-lg">
+                <Link href="/our-services/buy-products">
+                  Browse All Listings 🛒
+                </Link>
               </Button>
             </div>
           </div>
