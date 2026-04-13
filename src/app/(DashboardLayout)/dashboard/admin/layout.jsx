@@ -1,5 +1,6 @@
-import { auth } from "../../../../auth";
+
 import { redirect } from "next/navigation";
+import { auth } from "../../../../../auth";
 
 async function AdminLayout({ children }) {
   const session = await auth();
