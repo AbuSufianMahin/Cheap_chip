@@ -23,6 +23,7 @@ const navMain = [
   {
     title: "User Panel",
     icon: User,
+    roles: ["user", "technician", "delivery", "admin"],
     items: [
       {
         title: "My Peripherals",
@@ -43,6 +44,7 @@ const navMain = [
   {
     title: "Technician Panel",
     icon: Wrench,
+    roles: ["technician"],
     items: [
       {
         title: "Assigned Products",
@@ -67,6 +69,7 @@ const navMain = [
   {
     title: "Delivery Panel",
     icon: Truck,
+    roles: ["delivery"],
     items: [
       {
         title: "Assigned Deliveries",
@@ -87,12 +90,14 @@ const navMain = [
   {
     title: "Admin Panel",
     icon: Shield,
+    roles: ["admin"],
     items: [
       {
         title: "Applications Review",
-        url: "/admin/applications",
+        url: "/dashboard/admin/applications",
       },
-      { title: "User management",
+      {
+        title: "User management",
         url: "/dashboard/admin/user-management",
       },
       {
@@ -118,6 +123,7 @@ const navMain = [
   {
     title: "Support",
     icon: LifeBuoy,
+    roles: ["user", "technician", "delivery", "admin"],
     items: [
       {
         title: "Help Center",
@@ -137,8 +143,11 @@ const navMain = [
 
 export function AppSidebar({ ...props }) {
   const { data, status } = useSession();
-  const isAdmin = data?.user?.role === "admin";
-  const visibleNavItems = navMain.filter((section) => section.title !== "Admin Panel" || isAdmin);
+  const userRole = data?.user?.role;
+
+  const visibleNavItems = navMain.filter((section) =>
+    section.roles.includes(userRole)
+  );
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -155,7 +164,7 @@ export function AppSidebar({ ...props }) {
       <Separator className={"my-2"} />
 
       {status === "loading" ? (
-        <SidebarSkeleton/>
+        <SidebarSkeleton />
       ) : (
         <>
           <SidebarContent>
