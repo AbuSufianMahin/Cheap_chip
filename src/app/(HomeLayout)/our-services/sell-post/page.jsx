@@ -19,21 +19,53 @@ function OurServices() {
     setSuccessMessage('');
 
     try {
-      const response = await fetch('/api/products', {
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
+      const now = new Date().toISOString();
+
+      const payload = {
+
+
+        // new enriched format
+        name: data.productName,
+        image: data.productImage,
+        category: (data.productCategory || '').toLowerCase().replace(/\s+/g, '_'),
+        description: data.productDescription,
+        customerEmail: data.customerEmail || null,
+        customerPhone: data.productContactNumber,
+        assignedDeliveryman: null,
+        assignedTechnician: null,
+        current_status: 'assigned',
+        finalStatus: null,
+        condition: data.productCondition || null,
+        technicianDecision: null,
+        askingPrice: parseFloat(data.productPrice),
+        customerDecision: null,
+        evaluatedValue: null,
+        pickupLocation: {
+          address: data.productLocation,
+          coordinates: {
+            lat: null,
+            lng: null,
+          },
+        },
+        activity_log: {
+          createdAt: now,
+          assignedAt: now,
+          pickedAt: null,
+          deliveredAt: null,
+          inspectedAt: null,
+          pricedAt: null,
+          customerDecidedAt: null,
+          finalizedAt: null,
+        },
+      };
+
+      const response = await fetch(`${apiBaseUrl}/api/product-lifecycle/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          productName: data.productName,
-          productCategory: data.productCategory,
-          productCondition: data.productCondition,
-          productPrice: parseFloat(data.productPrice),
-          productDescription: data.productDescription,
-          productImage: data.productImage,
-          productLocation: data.productLocation,
-          productContactNumber: data.productContactNumber,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = await response.json();
