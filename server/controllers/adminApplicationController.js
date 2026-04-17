@@ -6,6 +6,8 @@ const APPLICATION_COLLECTIONS = {
   technician: "technicianApplications",
 };
 
+const DELIVERYMEN_INFO_COLLECTION = "deliver men info";
+
 const ALLOWED_APPLICATION_STATUSES = ["approved", "declined"];
 
 const normalizeApplication = (application, applicationType) => {
@@ -34,6 +36,20 @@ const normalizeApplication = (application, applicationType) => {
 };
 
 const getCollectionName = (applicationType) => APPLICATION_COLLECTIONS[applicationType] || null;
+
+const buildDeliverymanInfoDocument = (application) => {
+  return {
+    name: application.name,
+    email: application.email,
+    phone: application.mobileNumber,
+    isActive: true,
+    currentlyAssigned: [],
+    stats: {
+      moneyCollected: 0,
+      totalAssigned: 0,
+    },
+  };
+};
 
 const getAdminApplications = async (req, res) => {
   try {
@@ -82,12 +98,14 @@ const updateApplicationStatus = async (req, res) => {
 
     const applicationObjectId = new ObjectId(applicationId);
 
+    const reviewedAt = new Date();
+
     const updateResult = await db.collection(collectionName).updateOne(
       { _id: applicationObjectId },
       {
         $set: {
           status,
-          reviewedAt: new Date(),
+          reviewedAt,
           reviewedBy: reviewedBy || null,
         },
       },
@@ -98,6 +116,37 @@ const updateApplicationStatus = async (req, res) => {
     }
 
     const updatedApplication = await db.collection(collectionName).findOne({ _id: applicationObjectId });
+
+    if (applicationType === "delivery" && status === "approved" && updatedApplication?.email) {
+      const email = updatedApplication.email.trim().toLowerCase();
+      const deliverymanInfo = buildDeliverymanInfoDocument(updatedApplication);
+
+      await db.collection(DELIVERYMEN_INFO_COLLECTION).updateOne(
+        { email },
+        {
+          $set: {
+            ...deliverymanInfo,
+            email,
+          },
+          $unset: {
+            location: "",
+            mobileNumber: "",
+            drivingLicense: "",
+            drivingLicensePicture: "",
+            idProof: "",
+            sourceApplicationId: "",
+            status: "",
+            approvedAt: "",
+            approvedBy: "",
+            updatedAt: "",
+          },
+          $setOnInsert: {
+            createdAt: reviewedAt,
+          },
+        },
+        { upsert: true },
+      );
+    }
 
     return res.status(200).json({
       message: "Application status updated successfully",
