@@ -123,7 +123,7 @@ const navMain = [
   {
     title: "Support",
     icon: LifeBuoy,
-    roles: ["user", "technician", "deliveryman", "admin"],
+    roles: ["user", "technician", "delivery", "admin"],
     items: [
       {
         title: "Help Center",

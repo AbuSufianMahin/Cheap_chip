@@ -285,8 +285,7 @@ function AdminApplicationsPage() {
               </div>
 
               {application.reviewedBy ? (
-                <p className="mt-4 text-xs text-slate-500">
-                  <span className="capitalize">{application.status}</span> by {application.reviewedBy}</p>
+                <p className="mt-4 text-xs text-slate-500">Reviewed by {application.reviewedBy}</p>
               ) : null}
 
               <div className="mt-5 flex flex-wrap gap-3">
