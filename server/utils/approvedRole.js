@@ -32,7 +32,7 @@ async function getApprovedRoleForEmail(db, email) {
   });
 
   if (approvedDelivery) {
-    return "delivery";
+    return "deliveryman";
   }
 
   return null;
