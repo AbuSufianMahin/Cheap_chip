@@ -37,7 +37,7 @@ const getCollectionName = (applicationType) => APPLICATION_COLLECTIONS[applicati
 
 const getAdminApplications = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
 
     const [deliveryApplications, technicianApplications] = await Promise.all([
       db.collection(APPLICATION_COLLECTIONS.delivery).find({}).toArray(),
@@ -62,7 +62,7 @@ const getAdminApplications = async (req, res) => {
 
 const updateApplicationStatus = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const { applicationType, applicationId } = req.params;
     const { status, reviewedBy } = req.body;
 

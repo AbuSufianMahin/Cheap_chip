@@ -1,12 +1,24 @@
-const { ObjectId } = require("mongodb");
 const connectDB = require("../utils/db");
 const bcrypt = require("bcrypt");
+const getApprovedRoleForEmail = require("../utils/approvedRole");
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 const registerWithCredentials = async (req, res) => {
   try {
     const db = await connectDB();
     const { name, email, password } = req.body;
-    const existingUser = await db.collection("credentials").findOne({ email });
+    const normalizedEmail = email.trim().toLowerCase();
+    const escapedEmail = escapeRegex(normalizedEmail);
+    const approvedRole = await getApprovedRoleForEmail(db, normalizedEmail);
+
+    const existingUser = await db.collection("credentials").findOne({
+      email: {
+        $regex: new RegExp(`^${escapedEmail}$`, "i"),
+      },
+    });
 
     if (existingUser) {
       if (existingUser.providers?.length === 1 && existingUser.providers[0] === "google") {
@@ -26,7 +38,7 @@ const registerWithCredentials = async (req, res) => {
       const now = new Date();
 
       const newUserCredentials = {
-        email,
+        email: normalizedEmail,
         hashedPassword,
         providers: ["credentials"],
         passwordChangedAt: now,
@@ -34,10 +46,10 @@ const registerWithCredentials = async (req, res) => {
 
       const newUserDetails = {
         name,
-        email,
+        email: normalizedEmail,
         image: process.env.DEFAULT_USER_IMAGE,
-        role: "user",
-        roleAssignedBy: "system",
+        role: approvedRole || "user",
+        roleAssignedBy: approvedRole ? "application-approval" : "system",
         createdAt: now,
         lastLoginAt: null,
       };

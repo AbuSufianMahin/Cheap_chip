@@ -3,7 +3,7 @@ const connectDB = require("../utils/db");
 
 const getAvailableDeliverymen = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
 
     const MAX_ACTIVE_DELIVERIES = 5;
 
@@ -36,55 +36,62 @@ const assignDeliverymanToProduct = async (req, res) => {
       .json({ message: "productId and deliverymanId are required" });
   }
 
+  let session = null;
+
   try {
-    const db = await connectDB();
+    const { db, client } = await connectDB();
+    session = client.startSession();
 
     const productObjId = new ObjectId(productId);
     const deliverymanObjId = new ObjectId(deliverymanId);
     const now = new Date();
 
-    const deliveryman = await db
-      .collection("deliveryman-demo")
-      .findOne({ _id: deliverymanObjId, isActive: true });
-    if (!deliveryman) {
-      throw Object.assign(new Error("Deliveryman not found or inactive"), {
-        status: 404,
-      });
-    }
+    await session.withTransaction(async () => {
+      const deliveryman = await db
+        .collection("deliveryman-demo")
+        .findOne({ _id: deliverymanObjId, isActive: true }, { session });
+      if (!deliveryman) {
+        throw Object.assign(new Error("Deliveryman not found or inactive"), {
+          status: 404,
+        });
+      }
 
-    const product = await db
-      .collection("products-demo")
-      .findOne({ _id: productObjId });
-    if (!product) {
-      throw Object.assign(new Error("Product not found"), { status: 404 });
-    }
-    if (product.assignedDeliveryman) {
-      throw Object.assign(
-        new Error("Product already has an assigned deliveryman"),
-        { status: 409 },
+      const product = await db
+        .collection("products-demo")
+        .findOne({ _id: productObjId }, { session });
+      if (!product) {
+        throw Object.assign(new Error("Product not found"), { status: 404 });
+      }
+      if (product.assignedDeliveryman) {
+        throw Object.assign(
+          new Error("Product already has an assigned deliveryman"),
+          { status: 409 },
+        );
+      }
+
+      await db.collection("deliveryman-demo").updateOne(
+        { _id: deliverymanObjId },
+        {
+          $push: {
+            currentlyAssigned: { orderId: productObjId, assignedAt: now },
+          },
+          $inc: { "stats.totalAssigned": 1 },
+        },
+        { session },
       );
-    }
 
-    await db.collection("deliveryman-demo").updateOne(
-      { _id: deliverymanObjId },
-      {
-        $push: {
-          currentlyAssigned: { orderId: productObjId, assignedAt: now },
+      await db.collection("products-demo").updateOne(
+        { _id: productObjId },
+        {
+          $set: {
+            assignedDeliveryman: deliverymanObjId,
+            current_status: "assigned",
+            "activity_log.assignedAt": now,
+          },
         },
-        $inc: { "stats.totalAssigned": 1 },
-      }
-    );
-
-    await db.collection("products-demo").updateOne(
-      { _id: productObjId },
-      {
-        $set: {
-          assignedDeliveryman: deliverymanObjId,
-          current_status: "assigned",
-          "activity_log.assignedAt": now,
-        },
-      }
-    );
+        { session },
+      );
+    });
 
     res.status(200).json({ message: "Rider assigned successfully" });
   } catch (error) {
@@ -92,6 +99,8 @@ const assignDeliverymanToProduct = async (req, res) => {
     res
       .status(error.status || 500)
       .json({ message: error.message || "Internal server error" });
+  } finally {
+    if (session) await session.endSession();
   }
 };
 module.exports = { getAvailableDeliverymen, assignDeliverymanToProduct };

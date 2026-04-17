@@ -1,5 +1,5 @@
 "use client";
-import { BookOpen, Bot, LifeBuoy, Settings2, Shield, SquareTerminal, Truck, User, Wrench } from "lucide-react";
+import { LifeBuoy, Shield, Truck, User, Wrench } from "lucide-react";
 
 import {
   Sidebar,
@@ -23,26 +23,19 @@ const navMain = [
   {
     title: "User Panel",
     icon: User,
+    roles: ["user", "technician", "delivery", "admin"],
     items: [
       {
         title: "My Peripherals",
-        url: "/user/peripherals",
+        url: "/dashboard/user/peripherals",
       },
       {
         title: "Track Products",
-        url: "/user/orders",
-      },
-      {
-        title: "Request Repair",
-        url: "/user/request-repair",
-      },
-      {
-        title: "Sell Item",
-        url: "/user/sell",
+        url: "/dashboard/user/orders",
       },
       {
         title: "Payment History",
-        url: "/user/payments",
+        url: "/dashboard/user/payments",
       },
     ],
   },
@@ -51,22 +44,23 @@ const navMain = [
   {
     title: "Technician Panel",
     icon: Wrench,
+    roles: ["technician"],
     items: [
       {
         title: "Assigned Products",
-        url: "/technician/assigned",
+        url: "/dashboard/technician/assigned",
       },
       {
         title: "In Progress",
-        url: "/technician/in-progress",
+        url: "/dashboard/technician/in-progress",
       },
       {
         title: "Completed Jobs",
-        url: "/technician/completed",
+        url: "/dashboard/technician/completed",
       },
       {
         title: "Report Issue",
-        url: "/technician/report",
+        url: "/dashboard/technician/report",
       },
     ],
   },
@@ -75,18 +69,19 @@ const navMain = [
   {
     title: "Delivery Panel",
     icon: Truck,
+    roles: ["delivery"],
     items: [
       {
         title: "Assigned Deliveries",
-        url: "/delivery/assigned",
+        url: "/dashboard/delivery/assigned",
       },
       {
         title: "All Deliveries",
-        url: "/delivery/all",
+        url: "/dashboard/delivery/all",
       },
       {
         title: "Delivery Status Update",
-        url: "/delivery/status",
+        url: "/dashboard/delivery/status",
       },
     ],
   },
@@ -95,30 +90,31 @@ const navMain = [
   {
     title: "Admin Panel",
     icon: Shield,
+    roles: ["admin"],
     items: [
       {
-        title: "Dashboard / Insights",
-        url: "/admin/dashboard",
+        title: "Applications Review",
+        url: "/dashboard/admin/applications",
       },
       {
-        title: "Manage Users",
-        url: "/admin/users",
+        title: "User management",
+        url: "/dashboard/admin/user-management",
+      },
+      {
+        title: "Manage Deliveryman",
+        url: "/dashboard/admin/manage-deliveryman",
       },
       {
         title: "Manage Technicians",
-        url: "/admin/technicians",
+        url: "/dashboard/admin/manage-technicians",
       },
       {
-        title: "Manage Delivery Team",
-        url: "/admin/delivery",
-      },
-      {
-        title: "Track All Products",
-        url: "/admin/products",
+        title: "Product Management",
+        url: "/dashboard/admin/product-management",
       },
       {
         title: "Reports & Analytics",
-        url: "/admin/reports",
+        url: "/dashboard/admin/reports-and-analytics",
       },
     ],
   },
@@ -127,6 +123,7 @@ const navMain = [
   {
     title: "Support",
     icon: LifeBuoy,
+    roles: ["user", "technician", "delivery", "admin"],
     items: [
       {
         title: "Help Center",
@@ -146,7 +143,12 @@ const navMain = [
 
 export function AppSidebar({ ...props }) {
   const { data, status } = useSession();
-  console.log("Status", status);
+
+  const userRole = data?.user?.role;
+
+  const visibleNavItems = navMain.filter((section) =>
+    section.roles.includes(userRole)
+  );
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -163,15 +165,15 @@ export function AppSidebar({ ...props }) {
       <Separator className={"my-2"} />
 
       {status === "loading" ? (
-        <SidebarSkeleton/>
+        <SidebarSkeleton />
       ) : (
         <>
           <SidebarContent>
-            <NavMain navItems={navMain} />
+            <NavMain navItems={visibleNavItems} />
           </SidebarContent>
 
           <SidebarFooter className={"border-t"}>
-            <NavUser user={data.user} />
+            {data?.user ? <NavUser user={data.user} /> : null}
           </SidebarFooter>
         </>
       )}
