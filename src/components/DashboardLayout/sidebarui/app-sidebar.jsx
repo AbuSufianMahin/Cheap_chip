@@ -23,7 +23,7 @@ const navMain = [
   {
     title: "User Panel",
     icon: User,
-    roles: ["user", "technician", "delivery", "deliveryman", "admin"],
+    roles: ["user", "technician", "deliveryman", "admin"],
     items: [
       {
         title: "My Peripherals",
@@ -69,7 +69,7 @@ const navMain = [
   {
     title: "Delivery Panel",
     icon: Truck,
-    roles: ["delivery", "deliveryman"],
+    roles:["deliveryman"],
     items: [
       {
         title: "Assigned Deliveries",
@@ -123,7 +123,7 @@ const navMain = [
   {
     title: "Support",
     icon: LifeBuoy,
-    roles: ["user", "technician", "delivery", "deliveryman", "admin"],
+    roles: ["user", "technician", "deliveryman", "admin"],
     items: [
       {
         title: "Help Center",

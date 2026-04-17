@@ -6,7 +6,7 @@ const APPLICATION_COLLECTIONS = {
   technician: "technicianApplications",
 };
 
-const DELIVERYMEN_INFO_COLLECTION = "deliver men info";
+const DELIVERYMEN_INFO_COLLECTION = "deliveryman-info";
 
 const ALLOWED_APPLICATION_STATUSES = ["approved", "declined"];
 
@@ -35,20 +35,36 @@ const normalizeApplication = (application, applicationType) => {
   };
 };
 
-const getCollectionName = (applicationType) => APPLICATION_COLLECTIONS[applicationType] || null;
+const getCollectionName = (applicationType) =>
+  APPLICATION_COLLECTIONS[applicationType] || null;
 
-const buildDeliverymanInfoDocument = (application) => {
+const buildDeliverymanInfoDocument = (applicationInfo) => {
   return {
-    name: application.name,
-    email: application.email,
-    phone: application.mobileNumber,
+    name: applicationInfo.name,
+    email: applicationInfo.email.trim().toLowerCase(),
+    phone: applicationInfo.mobileNumber,
     isActive: true,
-    currentlyAssigned: [],
+    currentlyAssigned: [
+      // {
+      // oderId: new ObjectId(),
+      // assignedAt : new Date(),
+      // }
+    ],
+    completedDeliveries: [
+      // {
+      // oderId: new ObjectId(),
+      // assignedAt : new Date(),
+      // deliveredAt : new Date(),
+      // }
+    ],
     stats: {
-      moneyCollected: 0,
       totalAssigned: 0,
+      totalCompleted: 0,
+      totalCancelled: 0,
+      moneyCollected: 0,
+      averageDeliveryTime: 0,
     },
-  };
+  }
 };
 
 const getAdminApplications = async (req, res) => {
@@ -61,8 +77,12 @@ const getAdminApplications = async (req, res) => {
     ]);
 
     const applications = [
-      ...deliveryApplications.map((application) => normalizeApplication(application, "delivery")),
-      ...technicianApplications.map((application) => normalizeApplication(application, "technician")),
+      ...deliveryApplications.map((application) =>
+        normalizeApplication(application, "delivery"),
+      ),
+      ...technicianApplications.map((application) =>
+        normalizeApplication(application, "technician"),
+      ),
     ].sort((firstApplication, secondApplication) => {
       const firstCreatedAt = new Date(firstApplication.createdAt).getTime();
       const secondCreatedAt = new Date(secondApplication.createdAt).getTime();
@@ -81,7 +101,6 @@ const updateApplicationStatus = async (req, res) => {
     const { db } = await connectDB();
     const { applicationType, applicationId } = req.params;
     const { status, reviewedBy } = req.body;
-
     const collectionName = getCollectionName(applicationType);
 
     if (!collectionName) {
@@ -97,7 +116,6 @@ const updateApplicationStatus = async (req, res) => {
     }
 
     const applicationObjectId = new ObjectId(applicationId);
-
     const reviewedAt = new Date();
 
     const updateResult = await db.collection(collectionName).updateOne(
@@ -115,37 +133,22 @@ const updateApplicationStatus = async (req, res) => {
       return res.status(404).json({ message: "Application not found" });
     }
 
-    const updatedApplication = await db.collection(collectionName).findOne({ _id: applicationObjectId });
+    const updatedApplication = await db
+      .collection(collectionName)
+      .findOne({ _id: applicationObjectId });
 
-    if (applicationType === "delivery" && status === "approved" && updatedApplication?.email) {
-      const email = updatedApplication.email.trim().toLowerCase();
-      const deliverymanInfo = buildDeliverymanInfoDocument(updatedApplication);
-
-      await db.collection(DELIVERYMEN_INFO_COLLECTION).updateOne(
-        { email },
-        {
-          $set: {
-            ...deliverymanInfo,
-            email,
-          },
-          $unset: {
-            location: "",
-            mobileNumber: "",
-            drivingLicense: "",
-            drivingLicensePicture: "",
-            idProof: "",
-            sourceApplicationId: "",
-            status: "",
-            approvedAt: "",
-            approvedBy: "",
-            updatedAt: "",
-          },
-          $setOnInsert: {
-            createdAt: reviewedAt,
-          },
-        },
-        { upsert: true },
-      );
+    if (
+      applicationType === "delivery" &&
+      status === "approved" &&
+      updatedApplication?.email
+    ) {
+      const { name, email, mobileNumber } = updatedApplication;
+      const deliverymanInfo = buildDeliverymanInfoDocument({ name, email, mobileNumber });
+      
+      await db.collection(DELIVERYMEN_INFO_COLLECTION).insertOne({
+        ...deliverymanInfo,
+        createdAt: reviewedAt,
+      });
     }
 
     return res.status(200).json({
