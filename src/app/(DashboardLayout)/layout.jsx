@@ -1,5 +1,5 @@
 "use client"
-import { AppSidebar } from "@/components/DashboardLayout/sidebarUI/app-sidebar";
+import { AppSidebar } from "@/components/DashboardLayout/sidebarui/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
