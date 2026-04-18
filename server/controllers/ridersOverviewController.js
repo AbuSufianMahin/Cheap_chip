@@ -2,7 +2,7 @@ const connectDB = require("../utils/db");
 
 const getRidersOverview = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const riders = await db.collection("ridersInfo").find({}).toArray();
 
     if (riders.length === 0) {

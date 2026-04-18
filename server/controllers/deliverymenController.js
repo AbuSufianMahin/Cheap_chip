@@ -1,9 +1,9 @@
 const { ObjectId } = require("mongodb");
 const connectDB = require("../utils/db");
 
-const DELIVERYMEN_INFO_COLLECTION = "deliver men info";
-const LEGACY_DELIVERYMEN_COLLECTION = "deliveryman-demo";
+const DELIVERYMEN_INFO_COLLECTION = "deliveryman-info";
 const PRODUCTS_COLLECTION = "products-demo";
+
 const ALLOWED_DELIVERY_STATUSES = [
   "on the way",
   "picked up",
@@ -34,13 +34,13 @@ async function findDeliverymanByEmail(db, email, session) {
   }
 
   const fromLegacyCollection = await db
-    .collection(LEGACY_DELIVERYMEN_COLLECTION)
+    .collection(DELIVERYMEN_INFO_COLLECTION)
     .findOne({ email: normalizedEmail }, session ? { session } : undefined);
 
   if (fromLegacyCollection) {
     return {
       data: fromLegacyCollection,
-      collectionName: LEGACY_DELIVERYMEN_COLLECTION,
+      collectionName: DELIVERYMEN_INFO_COLLECTION,
     };
   }
 
@@ -65,7 +65,7 @@ const getAvailableDeliverymen = async (req, res) => {
 
     if (!availableDeliverymen.length) {
       availableDeliverymen = await db
-        .collection(LEGACY_DELIVERYMEN_COLLECTION)
+        .collection(DELIVERYMEN_INFO_COLLECTION)
         .find(query)
         .toArray();
     }
@@ -106,11 +106,11 @@ const assignDeliverymanToProduct = async (req, res) => {
 
       const deliveryCollectionName = deliverymanFromNewCollection
         ? DELIVERYMEN_INFO_COLLECTION
-        : LEGACY_DELIVERYMEN_COLLECTION;
+        : DELIVERYMEN_INFO_COLLECTION;
 
       const deliveryman = deliverymanFromNewCollection
         || await db
-          .collection(LEGACY_DELIVERYMEN_COLLECTION)
+          .collection(DELIVERYMEN_INFO_COLLECTION)
           .findOne({ _id: deliverymanObjId, isActive: true }, { session });
 
       if (!deliveryman) {

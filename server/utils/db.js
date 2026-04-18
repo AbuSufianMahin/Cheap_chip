@@ -5,7 +5,7 @@ let db;
 
 async function connectDB() {
   if (db) {
-    return db;
+    return { db, client } ;
   }
 
   if (!client) {
@@ -16,8 +16,8 @@ async function connectDB() {
     client = new MongoClient(uri, {
       serverApi: {
         version: ServerApiVersion.v1,
-        strict: false,
-        deprecationErrors: false,
+        strict: true,
+        deprecationErrors: true,
       },
       tls: true,
       tlsAllowInvalidCertificates: false,
@@ -33,7 +33,7 @@ async function connectDB() {
   }
 
   db = client.db(process.env.DB_NAME);
-  return db;
+  return { db, client };
 }
 
 module.exports = connectDB;

@@ -8,7 +8,7 @@ function escapeRegex(value) {
 
 const registerWithCredentials = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const { name, email, password } = req.body;
     const normalizedEmail = email.trim().toLowerCase();
     const escapedEmail = escapeRegex(normalizedEmail);
