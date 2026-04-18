@@ -205,7 +205,7 @@ function UserOrders() {
               <CardContent>
                 <div className="flex items-center gap-4">
                   {/* Product Image */}
-                  <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
                     {order.product?.productImage ? (
                       <img
                         src={order.product.productImage}

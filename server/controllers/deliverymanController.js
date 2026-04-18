@@ -47,6 +47,10 @@ async function findDeliverymanByEmail(db, email, session) {
   return null;
 }
 
+const getAllDeliverymenInfo = async (req, res) => {
+  console.log(req)
+}
+
 const getAvailableDeliverymen = async (req, res) => {
   try {
     const { db } = await connectDB();
@@ -296,6 +300,7 @@ const updateDeliveryStatus = async (req, res) => {
   }
 };
 module.exports = {
+  getAllDeliverymenInfo,
   getAvailableDeliverymen,
   assignDeliverymanToProduct,
   getAssignedDeliveries,
