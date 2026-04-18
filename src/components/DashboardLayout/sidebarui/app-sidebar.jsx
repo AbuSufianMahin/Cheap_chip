@@ -23,6 +23,7 @@ const navMain = [
   {
     title: "User Panel",
     icon: User,
+    roles: ["user", "technician", "deliveryman", "admin"],
     items: [
       {
         title: "My Peripherals",
@@ -43,6 +44,7 @@ const navMain = [
   {
     title: "Technician Panel",
     icon: Wrench,
+    roles: ["technician"],
     items: [
       {
         title: "Assigned Products",
@@ -67,6 +69,7 @@ const navMain = [
   {
     title: "Delivery Panel",
     icon: Truck,
+    roles:["deliveryman"],
     items: [
       {
         title: "Assigned Deliveries",
@@ -87,7 +90,16 @@ const navMain = [
   {
     title: "Admin Panel",
     icon: Shield,
+    roles: ["admin"],
     items: [
+      {
+        title: "Reports & Analytics",
+        url: "/dashboard/admin/reports-and-analytics",
+      },
+      {
+        title: "Applications Review",
+        url: "/dashboard/admin/applications",
+      },
       {
         title: "User management",
         url: "/dashboard/admin/user-management",
@@ -104,10 +116,6 @@ const navMain = [
         title: "Product Management",
         url: "/dashboard/admin/product-management",
       },
-      {
-        title: "Reports & Analytics",
-        url: "/dashboard/admin/reports-and-analytics",
-      },
     ],
   },
 
@@ -115,6 +123,7 @@ const navMain = [
   {
     title: "Support",
     icon: LifeBuoy,
+    roles: ["user", "technician", "delivery", "admin"],
     items: [
       {
         title: "Help Center",
@@ -134,6 +143,11 @@ const navMain = [
 
 export function AppSidebar({ ...props }) {
   const { data, status } = useSession();
+  const userRole = data?.user?.role;
+
+  const visibleNavItems = navMain.filter((section) =>
+    section.roles.includes(userRole)
+  );
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -150,15 +164,15 @@ export function AppSidebar({ ...props }) {
       <Separator className={"my-2"} />
 
       {status === "loading" ? (
-        <SidebarSkeleton/>
+        <SidebarSkeleton />
       ) : (
         <>
           <SidebarContent>
-            <NavMain navItems={navMain} />
+            <NavMain navItems={visibleNavItems} />
           </SidebarContent>
 
           <SidebarFooter className={"border-t"}>
-            <NavUser user={data.user} />
+            {data?.user ? <NavUser user={data.user} /> : null}
           </SidebarFooter>
         </>
       )}

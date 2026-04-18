@@ -25,10 +25,10 @@ async function connectDB() {
 
     try {
       await client.connect();
-      console.log("Cheap_chip MongoDB connected");
+      console.log("✓ Cheap_chip MongoDB connected");
     } catch (err) {
-      console.log("MongoDB connection error:", err);
-      throw err;
+      console.error("✗ MongoDB connection error:", err.message);
+      process.exit(1);
     }
   }
 

@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
 import AvailableRidersDialogue from '@/components/DashboardLayout/adminRoutesUI/AvailableRidersDialogue';
+import ProductLoadingSkeleton from '@/components/DashboardLayout/adminRoutesUI/ProductLoadingSkeleton';
 
 function page() {
   const [onlyUnassigned, setOnlyUnassigned] = useState(false);
@@ -21,52 +22,58 @@ function page() {
     }
   })
 
+  console.log(productData)
   return (
     <section>
-      {
-        isLoading ?
-          <p>loading....</p> :
-          <div className="p-6 space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">
-                Customer Sell Products
-              </h1>
-            </div>
-            <div className="flex items-center justify-end gap-2">
-              <Checkbox
-                id="unassigned"
-                checked={onlyUnassigned}
-                onCheckedChange={(checked) => setOnlyUnassigned(checked === true)}
-              />
-              <Label htmlFor="unassigned">Unassigned only</Label>
-            </div>
-            {/* Product List (Infinite Scroll Container) */}
-            <div className="grid lg:grid-cols-2 gap-y-2 gap-x-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">
+          Customer Sell Products
+        </h1>
+      </div>
+      <div className="flex items-center justify-end gap-2">
+        <Checkbox
+          id="unassigned"
+          checked={onlyUnassigned}
+          onCheckedChange={(checked) => setOnlyUnassigned(checked === true)}
+        />
+        <Label htmlFor="unassigned">Unassigned only</Label>
+      </div>
+      <div className="py-6 space-y-6">
+        <div className="grid lg:grid-cols-2 gap-y-2 gap-x-4">
 
-              {/* Replace this map with real data */}
-              {productData.map((product) => (
+          {
+            isLoading ?
+
+              Array.from({ length: 6 }).map((_, i) => (
+                <ProductLoadingSkeleton key={i} />
+              ))
+
+              :
+
+              productData.map((product, index) => (
                 <div
                   key={product._id}
-                  className="border rounded-xl px-6 py-2 flex gap-4 items-center"
+                  className="rounded-lg shadow-sm p-6 sm:px-6 sm:py-2 flex flex-col sm:flex-row gap-4 sm:items-center"
                 >
-                  <Image
-                    src={product.image}
-                    className="rounded-md object-cover"
-                    width={128}
-                    height={128}
-                    alt={`${product.name} image`}
-                    priority
-                  />
+                  <div className="relative w-full sm:w-32 h-32"> {/* or any size */}
+                    <Image
+                      src={product.productImage}
+                      fill
+                      className="rounded-md object-cover"
+                      alt={`${product.productName} image`}
+                      priority={index < 3}
+                    />
+                  </div>
 
-                  <div className="flex-1 flex gap-2 flex-col xl:flex-row items-center justify-between">
+                  <div className="flex-1 flex gap-2 flex-col xl:flex-row xl:items-center justify-between">
                     <div>
-                      <h2 className="font-semibold">{product.name}</h2>
+                      <h2 className="font-semibold">{product.productName}</h2>
                       <p className="text-sm text-gray-500">
-                        {product.description}
+                        {product.productDescription}
                       </p>
                       <p className="text-sm font-medium mt-1">
-                        Price (customer):{" "}
+                        Asking Price:{" "}
                         <span className="font-medium">
                           {typeof product.askingPrice === "number" ? `৳${product.askingPrice}` : "Not set"}
                         </span>
@@ -80,10 +87,11 @@ function page() {
                     }
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-      }
+              ))
+
+          }
+        </div>
+      </div>
     </section>
   )
 }

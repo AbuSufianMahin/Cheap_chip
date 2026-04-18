@@ -1,5 +1,5 @@
 "use client"
-import { AppSidebar } from "@/components/DashboardLayout/sidebarUI/app-sidebar";
+import { AppSidebar } from "@/components/DashboardLayout/sidebarui/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -21,7 +21,7 @@ function DashboardLayout({ children }) {
           <AppSidebar />
           <SidebarInset>
             <header className="flex h-16 shrink-0 items-center gap-2">
-              <div className="flex items-center gap-2 px-4">
+              <div className="flex items-center gap-2 px-4 sm:px-8">
                 <SidebarTrigger className="-ml-1" />
                 <Separator
                   orientation="vertical"
@@ -29,7 +29,7 @@ function DashboardLayout({ children }) {
                 />
               </div>
             </header>
-            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+            <div className="flex flex-1 flex-col gap-4 p-4 pt-0 sm:p-8 sm:pt-0">
 
               {children}
 
