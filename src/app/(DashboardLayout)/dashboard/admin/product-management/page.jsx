@@ -22,6 +22,7 @@ function page() {
     }
   })
 
+  console.log(productData)
   return (
     <section>
       {/* Header */}
@@ -50,29 +51,29 @@ function page() {
 
               :
 
-              productData.map((product) => (
+              productData.map((product, index) => (
                 <div
                   key={product._id}
                   className="rounded-lg shadow-sm p-6 sm:px-6 sm:py-2 flex flex-col sm:flex-row gap-4 sm:items-center"
                 >
                   <div className="relative w-full sm:w-32 h-32"> {/* or any size */}
                     <Image
-                      src={product.image}
+                      src={product.productImage}
                       fill
                       className="rounded-md object-cover"
-                      alt={`${product.name} image`}
-                      priority
+                      alt={`${product.productName} image`}
+                      priority={index < 3}
                     />
                   </div>
 
                   <div className="flex-1 flex gap-2 flex-col xl:flex-row xl:items-center justify-between">
                     <div>
-                      <h2 className="font-semibold">{product.name}</h2>
+                      <h2 className="font-semibold">{product.productName}</h2>
                       <p className="text-sm text-gray-500">
-                        {product.description}
+                        {product.productDescription}
                       </p>
                       <p className="text-sm font-medium mt-1">
-                        Price (customer):{" "}
+                        Asking Price:{" "}
                         <span className="font-medium">
                           {typeof product.askingPrice === "number" ? `৳${product.askingPrice}` : "Not set"}
                         </span>
