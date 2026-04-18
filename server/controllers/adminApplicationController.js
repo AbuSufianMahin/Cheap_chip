@@ -75,7 +75,7 @@ const getAdminApplications = async (req, res) => {
       db.collection(APPLICATION_COLLECTIONS.delivery).find({}).toArray(),
       db.collection(APPLICATION_COLLECTIONS.technician).find({}).toArray(),
     ]);
-
+    
     const applications = [
       ...deliveryApplications.map((application) =>
         normalizeApplication(application, "delivery"),

@@ -30,6 +30,8 @@ async function connectDB() {
         strict: true,
         deprecationErrors: true,
       },
+      tls: true,
+      tlsAllowInvalidCertificates: false,
     });
 
     try {
