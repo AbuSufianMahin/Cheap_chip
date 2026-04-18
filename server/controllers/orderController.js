@@ -236,7 +236,7 @@ const updateOrderStatus = async (req, res) => {
 
 const supportSearchOrders = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const {
       productName = "",
       productCategory = "",

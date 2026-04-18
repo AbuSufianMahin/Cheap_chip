@@ -53,18 +53,19 @@ function page() {
               productData.map((product) => (
                 <div
                   key={product._id}
-                  className="border rounded-xl px-6 py-2 flex gap-4 items-center"
+                  className="rounded-lg shadow-sm p-6 sm:px-6 sm:py-2 flex flex-col sm:flex-row gap-4 sm:items-center"
                 >
-                  <Image
-                    src={product.image}
-                    className="rounded-md object-cover"
-                    width={128}
-                    height={128}
-                    alt={`${product.name} image`}
-                    priority
-                  />
+                  <div className="relative w-full sm:w-32 h-32"> {/* or any size */}
+                    <Image
+                      src={product.image}
+                      fill
+                      className="rounded-md object-cover"
+                      alt={`${product.name} image`}
+                      priority
+                    />
+                  </div>
 
-                  <div className="flex-1 flex gap-2 flex-col xl:flex-row items-center justify-between">
+                  <div className="flex-1 flex gap-2 flex-col xl:flex-row xl:items-center justify-between">
                     <div>
                       <h2 className="font-semibold">{product.name}</h2>
                       <p className="text-sm text-gray-500">
