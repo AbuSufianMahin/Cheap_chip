@@ -46,7 +46,7 @@ function OurServices() {
               Welcome to Cheap Chip Marketplace
             </div>
 
-            <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-green-600 via-emerald-600 to-green-800 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-6xl font-bold mb-6 bg-linear-to-r from-green-600 via-emerald-600 to-green-800 bg-clip-text text-transparent leading-tight">
               What brings you here today?
             </h1>
 
@@ -89,7 +89,7 @@ function OurServices() {
                     </div>
 
                     <Button
-                      className="w-full py-4 text-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
+                      className="w-full py-4 text-lg bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-blue-500/25"
                       asChild
                     >
                       <Link href="/our-services/buy-products">
@@ -229,7 +229,7 @@ function OurServices() {
                 {/* Sample Product Cards */}
                 {[1, 2, 3, 4, 5, 6].map((item) => (
                   <div key={item} className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    <div className="h-48 bg-gradient-to-r from-green-100 to-blue-100 flex items-center justify-center">
+                    <div className="h-48 bg-linear-to-r from-green-100 to-blue-100 flex items-center justify-center">
                       <span className="text-6xl">🔧</span>
                     </div>
                     <div className="p-6">
@@ -251,7 +251,7 @@ function OurServices() {
             <div className="text-center bg-linear-to-r from-blue-50 to-green-50 rounded-3xl p-12">
               <h3 className="text-3xl font-bold mb-4">Ready to find your perfect chips?</h3>
               <p className="text-gray-600 mb-6">Join thousands of satisfied buyers who found exactly what they needed</p>
-              <Button asChild className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-4 text-lg rounded-2xl shadow-lg">
+              <Button asChild className="bg-linear-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-4 text-lg rounded-2xl shadow-lg">
                 <Link href="/our-services/buy-products">
                   Browse All Listings 🛒
                 </Link>

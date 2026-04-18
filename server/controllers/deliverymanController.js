@@ -2,7 +2,7 @@ const { ObjectId } = require("mongodb");
 const connectDB = require("../utils/db");
 
 const DELIVERYMEN_INFO_COLLECTION = "deliveryman-info";
-const PRODUCTS_COLLECTION = "products-demo";
+const PRODUCTS_COLLECTION = "products";
 
 const ALLOWED_DELIVERY_STATUSES = [
   "on the way",
