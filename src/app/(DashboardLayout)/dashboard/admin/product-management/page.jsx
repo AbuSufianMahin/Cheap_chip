@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
 import AvailableRidersDialogue from '@/components/DashboardLayout/adminRoutesUI/AvailableRidersDialogue';
+import ProductLoadingSkeleton from '@/components/DashboardLayout/adminRoutesUI/ProductLoadingSkeleton';
 
 function page() {
   const [onlyUnassigned, setOnlyUnassigned] = useState(false);
@@ -23,29 +24,33 @@ function page() {
 
   return (
     <section>
-      {
-        isLoading ?
-          <p>loading....</p> :
-          <div className="p-6 space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">
-                Customer Sell Products
-              </h1>
-            </div>
-            <div className="flex items-center justify-end gap-2">
-              <Checkbox
-                id="unassigned"
-                checked={onlyUnassigned}
-                onCheckedChange={(checked) => setOnlyUnassigned(checked === true)}
-              />
-              <Label htmlFor="unassigned">Unassigned only</Label>
-            </div>
-            {/* Product List (Infinite Scroll Container) */}
-            <div className="grid lg:grid-cols-2 gap-y-2 gap-x-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">
+          Customer Sell Products
+        </h1>
+      </div>
+      <div className="flex items-center justify-end gap-2">
+        <Checkbox
+          id="unassigned"
+          checked={onlyUnassigned}
+          onCheckedChange={(checked) => setOnlyUnassigned(checked === true)}
+        />
+        <Label htmlFor="unassigned">Unassigned only</Label>
+      </div>
+      <div className="py-6 space-y-6">
+        <div className="grid lg:grid-cols-2 gap-y-2 gap-x-4">
 
-              {/* Replace this map with real data */}
-              {productData.map((product) => (
+          {
+            isLoading ?
+
+              Array.from({ length: 6 }).map((_, i) => (
+                <ProductLoadingSkeleton key={i} />
+              ))
+
+              :
+
+              productData.map((product) => (
                 <div
                   key={product._id}
                   className="border rounded-xl px-6 py-2 flex gap-4 items-center"
@@ -80,10 +85,11 @@ function page() {
                     }
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-      }
+              ))
+
+          }
+        </div>
+      </div>
     </section>
   )
 }

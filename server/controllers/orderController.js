@@ -65,7 +65,7 @@ const normalizeStatus = (status) => {
 
 const trackOrder = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const { orderId } = req.params;
 
     // Find order by orderId
@@ -122,7 +122,7 @@ const trackOrder = async (req, res) => {
 
 const createOrder = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const { productId, buyerInfo } = req.body;
 
     // Validate required fields
@@ -156,7 +156,7 @@ const createOrder = async (req, res) => {
 
 const getUserOrders = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const { userId } = req.params;
 
     const orders = await db.collection("orders").find({ "buyerInfo.userId": userId }).toArray();
@@ -192,7 +192,7 @@ const getUserOrders = async (req, res) => {
 
 const updateOrderStatus = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const { orderId } = req.params;
     const { status, description } = req.body;
 

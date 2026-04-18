@@ -52,6 +52,19 @@ function OurServices() {
     reader.readAsDataURL(file);
   };
 
+  const getPriceSuggestions = (category) => {
+    const suggestions = {
+      'CPU Chips': '৳500 - ৳50,000 (Intel i3: ৳2,000-৳5,000, Intel i5: ৳5,000-৳15,000, Intel i7: ৳10,000-৳30,000, Intel i9: ৳25,000-৳50,000)',
+      'GPU Chips': '৳1,000 - ৳1,50,000 (GTX 1050: ৳5,000-৳10,000, RTX 2060: ৳20,000-৳40,000, RTX 3070: ৳40,000-৳80,000, RTX 4090: ৳1,00,000-৳1,50,000)',
+      'RAM Chips': '৳200 - ৳15,000 (4GB DDR4: ৳500-৳1,500, 8GB DDR4: ৳1,000-৳3,000, 16GB DDR4: ৳2,500-৳7,000, 32GB DDR4: ৳5,000-৳15,000)',
+      'Motherboard Chips': '৳300 - ৳25,000 (Entry Level: ৳1,000-৳5,000, Gaming: ৳5,000-৳15,000, Workstation: ৳10,000-৳25,000)',
+      'SSD Chips': '৳150 - ৳20,000 (120GB: ৳500-৳1,500, 256GB: ৳1,000-৳3,000, 512GB: ৳2,000-৳6,000, 1TB: ৳4,000-৳12,000)',
+      'Power Supply Chips': '৳100 - ৳8,000 (450W: ৳500-৳1,500, 650W: ৳1,000-৳3,000, 850W: ৳2,000-৳6,000, 1000W+: ৳3,000-৳8,000)',
+      'Other Chips': '৳50 - ৳10,000 (Cooling fans, cables, adapters, etc.)'
+    };
+    return suggestions[category] || '৳50 - ৳10,000 (Contact us for specific guidance)';
+  };
+
   const onSubmit = async (data) => {
     setLoading(true);
     setErrorMessage('');
@@ -221,7 +234,7 @@ function OurServices() {
                 type="number"
                 step="500"
                 placeholder="Enter price"
-                {...register('productPrice', { 
+                {...register('productPrice', {
                   required: 'Price is required',
                   pattern: {
                     value: /^\d+(\.\d{1,2})?$/,
@@ -314,8 +327,8 @@ function OurServices() {
           </div>
 
           {/* Submit Button */}
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={loading}
             className="w-full h-12 bg-linear-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold text-lg rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
           >

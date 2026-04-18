@@ -23,7 +23,7 @@ const navMain = [
   {
     title: "User Panel",
     icon: User,
-    roles: ["user", "technician", "delivery", "admin"],
+    roles: ["user", "technician", "deliveryman", "admin"],
     items: [
       {
         title: "My Peripherals",
@@ -69,7 +69,7 @@ const navMain = [
   {
     title: "Delivery Panel",
     icon: Truck,
-    roles: ["delivery"],
+    roles:["deliveryman"],
     items: [
       {
         title: "Assigned Deliveries",
@@ -143,7 +143,6 @@ const navMain = [
 
 export function AppSidebar({ ...props }) {
   const { data, status } = useSession();
-
   const userRole = data?.user?.role;
 
   const visibleNavItems = navMain.filter((section) =>

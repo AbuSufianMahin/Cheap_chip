@@ -1,18 +1,18 @@
 import { auth } from "../../../../../auth";
 import { redirect } from "next/navigation";
 
-async function AdminLayout({ children }) {
+async function DeliveryLayout({ children }) {
   const session = await auth();
 
   if (!session?.user) {
     redirect("/login");
   }
 
-  if (session.user.role !== "admin") {
+  if (!["delivery", "deliveryman"].includes(session.user.role)) {
     redirect("/dashboard");
   }
 
   return children;
 }
 
-export default AdminLayout;
+export default DeliveryLayout;

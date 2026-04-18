@@ -3,7 +3,7 @@ const connectDB = require("../utils/db");
 
 const createProduct = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const {
       productName,
       productCategory,
@@ -80,7 +80,7 @@ const createProduct = async (req, res) => {
 
 const getProductLifecycleByID = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const { productID } = req.params;
 
     // Validate ObjectId format
@@ -112,7 +112,7 @@ const getProductLifecycleByID = async (req, res) => {
 
 const updateProductLifeCycleByID = async (req, res) => {
   try {
-    const db = await connectDB();
+    const { db } = await connectDB();
     const { productID } = req.params;
     const { repairLog, ...otherUpdates } = req.body;
 
