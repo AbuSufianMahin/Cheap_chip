@@ -21,11 +21,7 @@ app.set('trust proxy', 1);
 // MongoDB connection
 connectDB();
 
-// middlewire
-app.use(express.json({ limit: "20mb" }));
-app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-
-// CORS configuration
+// CORS configuration (must run before body parsing so errors still include CORS headers)
 const corsOptions = {
   origin: [
     'http://localhost:3000',
@@ -40,6 +36,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// middleware
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 const spamController = rateLimit({
   windowMs,
@@ -72,6 +72,17 @@ app.use('/api/job-applications', require("./routes/jobapplication"));
 
 app.get("/", (req, res) => {
   res.send("Running cheap chip server!");
+});
+
+app.use((err, req, res, next) => {
+  if (err?.type === "entity.too.large") {
+    return res.status(413).json({
+      message: "Payload too large. Please upload a smaller image.",
+      code: "PAYLOAD_TOO_LARGE",
+    });
+  }
+
+  return next(err);
 });
 
 app.listen(port, () => {

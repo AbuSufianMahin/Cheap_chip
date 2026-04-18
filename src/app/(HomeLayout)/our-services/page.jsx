@@ -6,9 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DollarSign, Users, TrendingUp, Shield, Star, CheckCircle, Search, ShoppingCart, Store } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 function OurServices() {
-  const [userType, setUserType] = useState(null); // null, 'buyer', 'seller'
+  const [userType, setUserType] = useState(null); // null, 'buyer'
+  const router = useRouter();
+
+  const handleSellerClick = () => {
+    router.push('/our-services/sell-post');
+  };
 
 
 
@@ -40,7 +46,7 @@ function OurServices() {
               Welcome to Cheap Chip Marketplace
             </div>
 
-            <h1 className="text-6xl font-bold mb-6 bg-linear-to-rrom-green-600 via-emerald-600 to-green-800 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-green-600 via-emerald-600 to-green-800 bg-clip-text text-transparent leading-tight">
               What brings you here today?
             </h1>
 
@@ -95,7 +101,7 @@ function OurServices() {
               </div>
 
               {/* Seller Card */}
-              <div className="group cursor-pointer" onClick={() => setUserType('seller')}>
+              <div className="group cursor-pointer" onClick={handleSellerClick}>
                 <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-green-200 p-8 md:p-12 hover:border-green-400 hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105">
                   <div className="text-center">
                     <div className="w-20 h-20 bg-linear-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -123,8 +129,11 @@ function OurServices() {
                       </div>
                     </div>
 
-                    <Button className="w-full py-4 text-lg bg-linear-to-rrom-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-green-500/25">
-                      Start Selling 💰
+                    <Button
+                      asChild
+                      className="w-full py-4 text-lg bg-linear-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-green-500/25"
+                    >
+                      <Link href="/our-services/sell-post">Start Selling 💰</Link>
                     </Button>
                   </div>
                 </div>
@@ -220,7 +229,7 @@ function OurServices() {
                 {/* Sample Product Cards */}
                 {[1, 2, 3, 4, 5, 6].map((item) => (
                   <div key={item} className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    <div className="h-48 bg-linear-to-rrom-green-100 to-blue-100 flex items-center justify-center">
+                    <div className="h-48 bg-gradient-to-r from-green-100 to-blue-100 flex items-center justify-center">
                       <span className="text-6xl">🔧</span>
                     </div>
                     <div className="p-6">

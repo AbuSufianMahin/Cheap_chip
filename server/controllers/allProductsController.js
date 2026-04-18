@@ -2,7 +2,7 @@ const connectDB = require("../utils/db");
 
 const getAllProductInfo = async (req, res) => {
   try {
-    const { db } = await connectDB();
+    const db = await connectDB();
     const onlyUnassigned = req.query.unassigned;
 
     let dbSearchQuery = {};
@@ -12,8 +12,9 @@ const getAllProductInfo = async (req, res) => {
     }
 
     const products = await db
-      .collection("products-demo")
+      .collection("products")
       .find(dbSearchQuery)
+      .sort({ createdAt: -1 })
       .toArray();
 
     return res.status(200).json(products);
