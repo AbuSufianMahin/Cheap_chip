@@ -17,6 +17,15 @@ function TrackProduct() {
   const [error, setError] = useState('');
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [supportForm, setSupportForm] = useState({
+    productName: '',
+    productCategory: '',
+    productCondition: '',
+    productId: '',
+  });
+  const [supportLoading, setSupportLoading] = useState(false);
+  const [supportError, setSupportError] = useState('');
+  const [supportResults, setSupportResults] = useState([]);
   const intervalRef = useRef(null);
 
   // Auto-fetch order on mount or when orderId changes via URL
@@ -86,6 +95,53 @@ function TrackProduct() {
     handleTrack();
   };
 
+  const handleSupportInputChange = (event) => {
+    const { name, value } = event.target;
+    setSupportForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSupportSearch = async (event) => {
+    event.preventDefault();
+    setSupportLoading(true);
+    setSupportError('');
+    setSupportResults([]);
+
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
+      const params = new URLSearchParams();
+
+      if (supportForm.productId.trim()) {
+        params.set('productId', supportForm.productId.trim());
+      } else {
+        params.set('productName', supportForm.productName.trim());
+        params.set('productCategory', supportForm.productCategory.trim());
+        params.set('productCondition', supportForm.productCondition.trim());
+      }
+
+      const response = await fetch(`${apiUrl}/api/orders/support/search?${params.toString()}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'No matching product found');
+      }
+
+      setSupportResults(data.results || []);
+      if (!data.results?.length) {
+        setSupportError('No matching product found. Please check details and try again.');
+      }
+    } catch (err) {
+      setSupportError(err.message || 'Support search failed');
+    } finally {
+      setSupportLoading(false);
+    }
+  };
+
+  const handleUseId = (value) => {
+    if (!value) return;
+    setOrderId(String(value));
+    handleTrack(String(value));
+  };
+
   const getStatusIcon = (status) => {
     switch (status?.toLowerCase()) {
       case 'ordered':
@@ -149,12 +205,12 @@ function TrackProduct() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="orderId" className="text-lg font-semibold">
-                  Order ID
+                  Order / Tracking ID
                 </Label>
                 <Input
                   id="orderId"
                   type="text"
-                  placeholder="Enter your order ID (e.g., ORD-123456)"
+                  placeholder="Enter Order ID or Tracking ID (e.g., ORD-123456 or 32200)"
                   value={orderId}
                   onChange={(e) => setOrderId(e.target.value)}
                   className="mt-2 text-lg"
@@ -297,14 +353,121 @@ function TrackProduct() {
         {/* Help Section */}
         <Card className="mt-8 shadow-lg border-green-200">
           <CardContent className="pt-6">
-            <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">Need Help?</h3>
-              <p className="text-gray-600 mb-4">
-                Can't find your order ID? Contact our support team for assistance.
+            <div>
+              <h3 className="text-lg font-semibold mb-2 text-center">Need Help?</h3>
+              <p className="text-gray-600 mb-6 text-center">
+                Forgot your tracking ID? Fill product details or product ID to recover it.
               </p>
-              <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50">
-                Contact Support
-              </Button>
+
+              <form onSubmit={handleSupportSearch} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="md:col-span-2">
+                    <Label htmlFor="supportProductId">Product ID (optional)</Label>
+                    <Input
+                      id="supportProductId"
+                      name="productId"
+                      value={supportForm.productId}
+                      onChange={handleSupportInputChange}
+                      placeholder="Paste product ID if you have it"
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="supportProductName">Product Name</Label>
+                    <Input
+                      id="supportProductName"
+                      name="productName"
+                      value={supportForm.productName}
+                      onChange={handleSupportInputChange}
+                      placeholder="e.g. RTX 3080"
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="supportProductCategory">Product Category</Label>
+                    <select
+                      id="supportProductCategory"
+                      name="productCategory"
+                      value={supportForm.productCategory}
+                      onChange={handleSupportInputChange}
+                      className="w-full mt-2 px-3 py-2 border border-green-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+                    >
+                      <option value="">Select category</option>
+                      <option value="CPU Chips">CPU Chips</option>
+                      <option value="GPU Chips">GPU Chips</option>
+                      <option value="RAM Chips">RAM Chips</option>
+                      <option value="Motherboard Chips">Motherboard Chips</option>
+                      <option value="SSD Chips">SSD Chips</option>
+                      <option value="Power Supply Chips">Power Supply Chips</option>
+                      <option value="Other Chips">Other Chips</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="supportProductCondition">Product Condition</Label>
+                    <select
+                      id="supportProductCondition"
+                      name="productCondition"
+                      value={supportForm.productCondition}
+                      onChange={handleSupportInputChange}
+                      className="w-full mt-2 px-3 py-2 border border-green-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+                    >
+                      <option value="">Select condition</option>
+                      <option value="Brand New">Brand New</option>
+                      <option value="Like New">Like New</option>
+                      <option value="Good">Good</option>
+                      <option value="Fair">Fair</option>
+                      <option value="Poor">Poor</option>
+                    </select>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={supportLoading}
+                  className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {supportLoading ? 'Searching...' : 'Find My Tracking ID'}
+                </Button>
+              </form>
+
+              {supportError && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  {supportError}
+                </div>
+              )}
+
+              {supportResults.length > 0 && (
+                <div className="mt-6 space-y-3">
+                  {supportResults.map((item, index) => (
+                    <div key={`${item.identifiers.productId}-${index}`} className="border border-green-200 rounded-lg p-4 bg-green-50/40">
+                      <p className="font-semibold text-gray-800">{item.productName}</p>
+                      <p className="text-sm text-gray-600">{item.productCategory} • {item.productCondition}</p>
+                      <p className="text-sm text-gray-600 mt-1">Product ID: {item.identifiers.productId}</p>
+                      <p className="text-sm text-gray-600">Tracking ID: {item.identifiers.trackingId || 'N/A'}</p>
+                      <p className="text-sm text-gray-600">Order ID: {item.identifiers.orderId || 'N/A'}</p>
+
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {item.identifiers.orderId && (
+                          <Button type="button" size="sm" onClick={() => handleUseId(item.identifiers.orderId)}>
+                            Use Order ID
+                          </Button>
+                        )}
+                        {item.identifiers.trackingId && (
+                          <Button type="button" size="sm" variant="outline" onClick={() => handleUseId(item.identifiers.trackingId)}>
+                            Use Tracking ID
+                          </Button>
+                        )}
+                        <Button type="button" size="sm" variant="outline" onClick={() => handleUseId(item.identifiers.productId)}>
+                          Use Product ID
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

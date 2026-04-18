@@ -14,6 +14,12 @@ const createProduct = async (req, res) => {
       productImage,
       productLocation,
       productContactNumber,
+      trackingId,
+      pickupLocation,
+      customerEmail,
+      customerPhone,
+      askingPrice,
+      activity_log,
     } = req.body;
 
     // Validate required fields
@@ -37,15 +43,21 @@ const createProduct = async (req, res) => {
       productCategory,
       productCondition,
       productPrice: productPrice || productPriceRange,
+      productPriceRange: productPriceRange || null,
       productDescription: productDescription || "",
       productImage: productImage || "",
       productLocation,
       productContactNumber,
+      trackingId: trackingId || null,
+      pickupLocation: pickupLocation || null,
+      customerEmail: customerEmail || null,
+      customerPhone: customerPhone || productContactNumber || null,
+      askingPrice: askingPrice || productPrice || productPriceRange || null,
       createdAt: new Date(),
       status: "active",
       current_status: "ordered",
       repairLog: [],
-      activity_log: {}
+      activity_log: activity_log || {}
     };
 
     const result = await db.collection("products").insertOne(newProduct);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,45 @@ function OurServices() {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [imageDataUrl, setImageDataUrl] = useState('');
+  const [imageFileName, setImageFileName] = useState('');
+  const imageInputRef = useRef(null);
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      setImageDataUrl('');
+      setImageFileName('');
+      return;
+    }
+
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      setErrorMessage('Image size must be under 10MB');
+      setImageDataUrl('');
+      setImageFileName('');
+      event.target.value = '';
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setErrorMessage('Please upload a valid image file (JPEG, PNG, or WebP)');
+      setImageDataUrl('');
+      setImageFileName('');
+      event.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setImageDataUrl(e.target?.result || '');
+      setImageFileName(file.name);
+      setErrorMessage('');
+    };
+    reader.readAsDataURL(file);
+  };
 
   const getPriceSuggestions = (category) => {
     const suggestions = {
@@ -31,39 +70,39 @@ function OurServices() {
     setErrorMessage('');
     setSuccessMessage('');
 
+    if (!imageDataUrl) {
+      setErrorMessage('Please upload a product image');
+      setLoading(false);
+      return;
+    }
+
     try {
       const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
       const now = new Date().toISOString();
+      const trackingId = data.trackingId?.trim() || `ORD-${Date.now()}`;
 
       const payload = {
+        productName: data.productName,
+        productCategory: data.productCategory,
+        productCondition: data.productCondition,
+        productPrice: parseFloat(data.productPrice),
+        productPriceRange: data.productPriceRange,
+        productDescription: data.productDescription,
+        productImage: imageDataUrl,
+        productLocation: data.productLocation,
+        productContactNumber: data.productContactNumber,
 
-
-        // new enriched format
-        name: data.productName,
-        image: data.productImage,
-        category: (data.productCategory || '').toLowerCase().replace(/\s+/g, '_'),
-        description: data.productDescription,
+        trackingId,
         customerEmail: data.customerEmail || null,
         customerPhone: data.productContactNumber,
-        assignedDeliveryman: null,
-        assignedTechnician: null,
-        current_status: 'assigned',
-        finalStatus: null,
-        condition: data.productCondition || null,
-        technicianDecision: null,
         askingPrice: parseFloat(data.productPrice),
-        customerDecision: null,
-        evaluatedValue: null,
         pickupLocation: {
           address: data.productLocation,
-          coordinates: {
-            lat: null,
-            lng: null,
-          },
+          coordinates: { lat: null, lng: null },
         },
         activity_log: {
           createdAt: now,
-          assignedAt: now,
+          assignedAt: null,
           pickedAt: null,
           deliveredAt: null,
           inspectedAt: null,
@@ -87,10 +126,13 @@ function OurServices() {
         throw new Error(result.message || 'Failed to create sell post');
       }
 
-      setSuccessMessage('Sell post created successfully!');
+      setSuccessMessage(`Sell post created successfully! Tracking ID: ${trackingId}`);
       reset();
-
-      // Clear success message after 3 seconds
+      setImageDataUrl('');
+      setImageFileName('');
+      if (imageInputRef.current) {
+        imageInputRef.current.value = '';
+      }
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       setErrorMessage(error.message || 'Failed to create sell post');
@@ -108,7 +150,7 @@ function OurServices() {
       <div className="w-full max-w-2xl mx-auto">
         {/* Header Section */}
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-bold mb-3 bg-linear-to-rrom-green-600 to-green-800 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
             Create Your Sell Post
           </h1>
           <p className="text-lg text-gray-600 leading-relaxed">
@@ -154,14 +196,14 @@ function OurServices() {
                 {...register('productCategory', { required: 'Category is required' })}
                 className="w-full mt-2 px-3 py-2 border border-green-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
               >
-                <option value="">Select a category</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Appliances">Appliances</option>
-                <option value="Furniture">Furniture</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Books">Books</option>
-                <option value="Sports">Sports</option>
-                <option value="Other">Other</option>
+                <option value="">Choose a chip category</option>
+                <option value="CPU Chips">CPU Chips (Processors)</option>
+                <option value="GPU Chips">GPU Chips (Graphics Cards)</option>
+                <option value="RAM Chips">RAM Chips (Memory)</option>
+                <option value="Motherboard Chips">Motherboard Chips</option>
+                <option value="SSD Chips">SSD Chips (Storage)</option>
+                <option value="Power Supply Chips">Power Supply Chips</option>
+                <option value="Other Chips">Other Computer Chips</option>
               </select>
               {errors.productCategory && <span className="text-red-500 text-sm mt-1 block">{errors.productCategory.message}</span>}
             </div>
@@ -186,11 +228,11 @@ function OurServices() {
 
             {/* Price */}
             <div>
-              <Label htmlFor="productPrice" className="text-gray-700 font-semibold">Price ($) *</Label>
+              <Label htmlFor="productPrice" className="text-gray-700 font-semibold">Price (৳) *</Label>
               <Input
                 id="productPrice"
                 type="number"
-                step="0.01"
+                step="500"
                 placeholder="Enter price"
                 {...register('productPrice', {
                   required: 'Price is required',
@@ -202,6 +244,24 @@ function OurServices() {
                 className="mt-2 border-green-200 focus:ring-green-500 focus:border-green-500"
               />
               {errors.productPrice && <span className="text-red-500 text-sm mt-1 block">{errors.productPrice.message}</span>}
+            </div>
+
+            {/* Price Range */}
+            <div>
+              <Label htmlFor="productPriceRange" className="text-gray-700 font-semibold">Price Range *</Label>
+              <select
+                id="productPriceRange"
+                {...register('productPriceRange', { required: 'Price range is required' })}
+                className="w-full mt-2 px-3 py-2 border border-green-200 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+              >
+                <option value="">Select price range</option>
+                <option value="0-1000">0 - 1,000</option>
+                <option value="1000-5000">1,000 - 5,000</option>
+                <option value="5000-10000">5,000 - 10,000</option>
+                <option value="10000-25000">10,000 - 25,000</option>
+                <option value="25000+">25,000+</option>
+              </select>
+              {errors.productPriceRange && <span className="text-red-500 text-sm mt-1 block">{errors.productPriceRange.message}</span>}
             </div>
 
             {/* Location */}
@@ -228,15 +288,30 @@ function OurServices() {
               {errors.productContactNumber && <span className="text-red-500 text-sm mt-1 block">{errors.productContactNumber.message}</span>}
             </div>
 
-            {/* Image URL */}
-            <div className="md:col-span-2">
-              <Label htmlFor="productImage" className="text-gray-700 font-semibold">Image URL</Label>
+            {/* Tracking ID */}
+            <div>
+              <Label htmlFor="trackingId" className="text-gray-700 font-semibold">Tracking ID</Label>
               <Input
-                id="productImage"
-                placeholder="Enter image URL"
-                {...register('productImage')}
+                id="trackingId"
+                placeholder="e.g. ORD-20260417-001"
+                {...register('trackingId')}
                 className="mt-2 border-green-200 focus:ring-green-500 focus:border-green-500"
               />
+            </div>
+
+            {/* Product Image Upload */}
+            <div className="md:col-span-2">
+              <Label htmlFor="productImage" className="text-gray-700 font-semibold">Product Image *</Label>
+              <input
+                ref={imageInputRef}
+                id="productImage"
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                onChange={handleImageChange}
+                className="mt-2 block w-full rounded-md border border-green-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              />
+              <p className="mt-1 text-xs text-gray-500">Supported: JPG, PNG, WebP (max 10MB)</p>
+              {imageFileName && <p className="mt-1 text-sm text-green-700">Selected: {imageFileName}</p>}
             </div>
 
             {/* Description */}
