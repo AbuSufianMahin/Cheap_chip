@@ -26,7 +26,7 @@ function DeliverymenReports() {
                 <MetricCards deliverymenStats={deliverymenStats} isLoading={isLoading} isError={isError} />
             </div>
 
-            <div className='grid lg:grid-cols-2 xl:grid-cols-7 gap-4'>
+            <div className='grid lg:grid-cols-5 xl:grid-cols-8 2xl:grid-cols-7 gap-4'>
                 <SuccessFailedDonutChart deliverymenStats={deliverymenStats} />
                 <TopDeliverymenBarChart topDeliverymen={deliverymenStats.topDeliverymen}/>
             </div>

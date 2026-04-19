@@ -10,7 +10,7 @@ function SuccessFailedDonutChart({ deliverymenStats }) {
     const total = data.reduce((sum, d) => sum + d.value, 0)
 
     return (
-        <div className="rounded-xl p-5 w-full shadow xl:col-span-2">
+        <div className="rounded-xl p-5 w-full shadow lg:col-span-2 xl:col-span-3 2xl:col-span-2">
             <p className="font-semibold text-lg mb-0.5">Success vs failed</p>
             <p className="text-xs mb-4">All riders combined</p>
 
