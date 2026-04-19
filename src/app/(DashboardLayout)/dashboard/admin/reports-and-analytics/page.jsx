@@ -8,7 +8,7 @@ const analyticsModules = [
     title: "Rider performance",
     description: "Avg delivery time, success rate, efficiency scores per rider",
     icon: <Users size={24} />,
-    href: "/dashboard/admin/manage-deliveryman",
+    href: "/dashboard/admin/deliverymen-reports",
     color: "text-teal-700 bg-teal-50",
   },
   {
@@ -45,13 +45,13 @@ function page() {
   const analyticsOverviewData = {
     totalOrders: 1240,
     revenue: 84500,
-    activeRiders: 18,
+    activeRiders: 5,
     deliverySuccess: 91,
   }
   const metricCards = [
     { label: "Total orders", key: "totalOrders", unit: null, trend: "+12% vs last month", up: true },
     { label: "Revenue", key: "revenue", unit: "৳", trend: "+8% vs last month", up: true },
-    { label: "Active riders", key: "activeRiders", unit: null, trend: "of 22 total", up: null },
+    { label: "Active riders", key: "activeRiders", unit: null, trend: "of 6 total", up: null },
     { label: "Delivery success", key: "deliverySuccess", unit: null, trend: "-2% vs last month", up: false },
   ]
 

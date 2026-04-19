@@ -5,11 +5,12 @@ const {
 	assignDeliverymanToProduct,
 	getAssignedDeliveries,
 	updateDeliveryStatus,
-	getAllDeliverymenInfo,
+	getDeliverymenPerformanceOverview,
 } = require("../controllers/deliverymanController");
 
 
-// router.get("/", getAllDeliverymenInfo)
+router.get("/statistics", getDeliverymenPerformanceOverview)
+
 router.get("/available", getAvailableDeliverymen);
 router.get("/assigned", getAssignedDeliveries);
 router.patch("/assign-product", assignDeliverymanToProduct);
