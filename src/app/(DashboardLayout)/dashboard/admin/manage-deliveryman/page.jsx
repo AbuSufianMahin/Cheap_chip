@@ -1,9 +1,8 @@
-import React from 'react'
-
 function page() {
-  return (
-    <div>Manage DeliveryMan</div>
-  )
+  return <div>
+    manage-deliveryman
+  </div>
+
 }
 
 export default page

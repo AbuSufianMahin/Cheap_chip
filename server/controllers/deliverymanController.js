@@ -3,6 +3,7 @@ const connectDB = require("../utils/db");
 
 const DELIVERYMEN_INFO_COLLECTION = "deliveryman-info";
 const PRODUCTS_COLLECTION = "products";
+const DELIVERY_TIME_TARGET = 20;
 
 const ALLOWED_DELIVERY_STATUSES = [
   "on the way",
@@ -47,9 +48,148 @@ async function findDeliverymanByEmail(db, email, session) {
   return null;
 }
 
-const getAllDeliverymenInfo = async (req, res) => {
-  console.log(req)
-}
+const getDeliverymenPerformanceOverview = async (req, res) => {
+  try {
+    const { db } = await connectDB();
+    // console.log(db)
+    const result = await db
+      .collection(DELIVERYMEN_INFO_COLLECTION)
+      .aggregate([
+        {
+          $facet: {
+            overview: [
+              {
+                $group: {
+                  _id: null,
+                  totalRiders: { $sum: 1 },
+                  activeRiders: { $sum: { $cond: ["$isActive", 1, 0] } },
+                  totalDeliveries: { $sum: "$stats.totalCompleted" },
+                  totalOngoing: { $sum: "$stats.totalAssigned" },
+                  totalCancelled: { $sum: "$stats.totalCancelled" },
+                  avgDeliveryTime: { $avg: "$stats.averageDeliveryTime" },
+                  avgSuccessRate: {
+                    $avg: {
+                      $cond: [
+                        { $gt: ["$stats.totalAssigned", 0] },
+                        {
+                          $multiply: [
+                            {
+                              $divide: [
+                                "$stats.totalCompleted",
+                                "$stats.totalAssigned",
+                              ],
+                            },
+                            100,
+                          ],
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                  avgEfficiencyScore: {
+                    $avg: {
+                      $let: {
+                        vars: {
+                          timeScore: {
+                            $max: [
+                              0,
+                              {
+                                $subtract: [
+                                  100,
+                                  {
+                                    $multiply: [
+                                      {
+                                        $divide: [
+                                          {
+                                            $subtract: [
+                                              "$stats.averageDeliveryTime",
+                                              DELIVERY_TIME_TARGET,
+                                            ],
+                                          },
+                                          DELIVERY_TIME_TARGET,
+                                        ],
+                                      },
+                                      100,
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                          successScore: {
+                            $cond: [
+                              { $gt: ["$stats.totalAssigned", 0] },
+                              {
+                                $multiply: [
+                                  {
+                                    $divide: [
+                                      "$stats.totalCompleted",
+                                      "$stats.totalAssigned",
+                                    ],
+                                  },
+                                  100,
+                                ],
+                              },
+                              0,
+                            ],
+                          },
+                        },
+                        in: {
+                          $add: [
+                            { $multiply: ["$$successScore", 0.6] },
+                            { $multiply: ["$$timeScore", 0.4] },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                  totalRiders: 1,
+                  activeRiders: 1,
+                  totalOngoing: 1,
+                  totalDeliveries: 1,
+                  totalCancelled: 1,
+                  avgDeliveryTime: { $round: ["$avgDeliveryTime", 0] },
+                  avgSuccessRate: { $round: ["$avgSuccessRate", 0] },
+                  avgEfficiencyScore: { $round: ["$avgEfficiencyScore", 0] },
+                },
+              },
+            ],
+            topDeliverymen: [
+              { $sort: { "stats.totalCompleted": -1 } },
+              { $limit: 5 },
+              {
+                $project: {
+                  _id: 0,
+                  name: 1,
+                  email: 1,
+                  totalCompleted: "$stats.totalCompleted",
+                },
+              },
+            ],
+          },
+        },
+      ])
+      .toArray();
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        ...result[0].overview[0],
+        topDeliverymen: result[0].topDeliverymen,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 const getAvailableDeliverymen = async (req, res) => {
   try {
@@ -112,10 +252,11 @@ const assignDeliverymanToProduct = async (req, res) => {
         ? DELIVERYMEN_INFO_COLLECTION
         : DELIVERYMEN_INFO_COLLECTION;
 
-      const deliveryman = deliverymanFromNewCollection
-        || await db
+      const deliveryman =
+        deliverymanFromNewCollection ||
+        (await db
           .collection(DELIVERYMEN_INFO_COLLECTION)
-          .findOne({ _id: deliverymanObjId, isActive: true }, { session });
+          .findOne({ _id: deliverymanObjId, isActive: true }, { session }));
 
       if (!deliveryman) {
         throw Object.assign(new Error("Deliveryman not found or inactive"), {
@@ -178,7 +319,9 @@ const getAssignedDeliveries = async (req, res) => {
     const activeOnly = req.query.activeOnly === "true";
 
     if (!normalizedEmail) {
-      return res.status(400).json({ message: "email query parameter is required" });
+      return res
+        .status(400)
+        .json({ message: "email query parameter is required" });
     }
 
     const deliveryman = await findDeliverymanByEmail(db, normalizedEmail);
@@ -215,7 +358,9 @@ const updateDeliveryStatus = async (req, res) => {
   const { productId, email, status } = req.body;
 
   if (!productId || !email || !status) {
-    return res.status(400).json({ message: "productId, email and status are required" });
+    return res
+      .status(400)
+      .json({ message: "productId, email and status are required" });
   }
 
   if (!ObjectId.isValid(productId)) {
@@ -224,7 +369,8 @@ const updateDeliveryStatus = async (req, res) => {
 
   if (!ALLOWED_DELIVERY_STATUSES.includes(status)) {
     return res.status(400).json({
-      message: "Invalid status. Allowed values: on the way, picked up, delivered, in Store house",
+      message:
+        "Invalid status. Allowed values: on the way, picked up, delivered, in Store house",
     });
   }
 
@@ -241,7 +387,9 @@ const updateDeliveryStatus = async (req, res) => {
       const deliveryman = await findDeliverymanByEmail(db, email, session);
 
       if (!deliveryman?.data?._id) {
-        throw Object.assign(new Error("Deliveryman not found"), { status: 404 });
+        throw Object.assign(new Error("Deliveryman not found"), {
+          status: 404,
+        });
       }
 
       const product = await db
@@ -252,8 +400,14 @@ const updateDeliveryStatus = async (req, res) => {
         throw Object.assign(new Error("Product not found"), { status: 404 });
       }
 
-      if (!product.assignedDeliveryman || product.assignedDeliveryman.toString() !== deliveryman.data._id.toString()) {
-        throw Object.assign(new Error("This product is not assigned to you"), { status: 403 });
+      if (
+        !product.assignedDeliveryman ||
+        product.assignedDeliveryman.toString() !==
+          deliveryman.data._id.toString()
+      ) {
+        throw Object.assign(new Error("This product is not assigned to you"), {
+          status: 403,
+        });
       }
 
       await db.collection(PRODUCTS_COLLECTION).updateOne(
@@ -289,7 +443,9 @@ const updateDeliveryStatus = async (req, res) => {
       }
     });
 
-    return res.status(200).json({ message: "Delivery status updated successfully" });
+    return res
+      .status(200)
+      .json({ message: "Delivery status updated successfully" });
   } catch (error) {
     console.error("Update delivery status error:", error);
     return res.status(error.status || 500).json({
@@ -299,8 +455,9 @@ const updateDeliveryStatus = async (req, res) => {
     if (session) await session.endSession();
   }
 };
+
 module.exports = {
-  getAllDeliverymenInfo,
+  getDeliverymenPerformanceOverview,
   getAvailableDeliverymen,
   assignDeliverymanToProduct,
   getAssignedDeliveries,
