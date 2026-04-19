@@ -5,6 +5,7 @@ import MetricCards from '@/components/DashboardLayout/adminRoutesUI/DeliverymenA
 
 import SuccessFailedDonutChart from '@/components/DashboardLayout/adminRoutesUI/DeliverymenAnalytics/SuccessFailedChart';
 import TopDeliverymenBarChart from '@/components/DashboardLayout/adminRoutesUI/DeliverymenAnalytics/TopDeliverymenBarChart';
+import SearchDeliverymenStats from '@/components/DashboardLayout/adminRoutesUI/DeliverymenAnalytics/SearchDeliverymenStats';
 
 function DeliverymenReports() {
     const { data: deliverymenStats = {}, isLoading, isError, error } = useQuery({
@@ -14,7 +15,7 @@ function DeliverymenReports() {
             return result.data.data;
         }
     })
-    console.log(deliverymenStats)
+    // console.log(deliverymenStats)
     return (
         <section className='space-y-6'>
             <div>
@@ -31,6 +32,9 @@ function DeliverymenReports() {
                 <TopDeliverymenBarChart topDeliverymen={deliverymenStats.topDeliverymen}/>
             </div>
 
+            <div>
+                <SearchDeliverymenStats/>
+            </div>
 
         </section>
     )

@@ -48,149 +48,6 @@ async function findDeliverymanByEmail(db, email, session) {
   return null;
 }
 
-const getDeliverymenPerformanceOverview = async (req, res) => {
-  try {
-    const { db } = await connectDB();
-    // console.log(db)
-    const result = await db
-      .collection(DELIVERYMEN_INFO_COLLECTION)
-      .aggregate([
-        {
-          $facet: {
-            overview: [
-              {
-                $group: {
-                  _id: null,
-                  totalRiders: { $sum: 1 },
-                  activeRiders: { $sum: { $cond: ["$isActive", 1, 0] } },
-                  totalDeliveries: { $sum: "$stats.totalCompleted" },
-                  totalOngoing: { $sum: "$stats.totalAssigned" },
-                  totalCancelled: { $sum: "$stats.totalCancelled" },
-                  avgDeliveryTime: { $avg: "$stats.averageDeliveryTime" },
-                  avgSuccessRate: {
-                    $avg: {
-                      $cond: [
-                        { $gt: ["$stats.totalAssigned", 0] },
-                        {
-                          $multiply: [
-                            {
-                              $divide: [
-                                "$stats.totalCompleted",
-                                "$stats.totalAssigned",
-                              ],
-                            },
-                            100,
-                          ],
-                        },
-                        0,
-                      ],
-                    },
-                  },
-                  avgEfficiencyScore: {
-                    $avg: {
-                      $let: {
-                        vars: {
-                          timeScore: {
-                            $max: [
-                              0,
-                              {
-                                $subtract: [
-                                  100,
-                                  {
-                                    $multiply: [
-                                      {
-                                        $divide: [
-                                          {
-                                            $subtract: [
-                                              "$stats.averageDeliveryTime",
-                                              DELIVERY_TIME_TARGET,
-                                            ],
-                                          },
-                                          DELIVERY_TIME_TARGET,
-                                        ],
-                                      },
-                                      100,
-                                    ],
-                                  },
-                                ],
-                              },
-                            ],
-                          },
-                          successScore: {
-                            $cond: [
-                              { $gt: ["$stats.totalAssigned", 0] },
-                              {
-                                $multiply: [
-                                  {
-                                    $divide: [
-                                      "$stats.totalCompleted",
-                                      "$stats.totalAssigned",
-                                    ],
-                                  },
-                                  100,
-                                ],
-                              },
-                              0,
-                            ],
-                          },
-                        },
-                        in: {
-                          $add: [
-                            { $multiply: ["$$successScore", 0.6] },
-                            { $multiply: ["$$timeScore", 0.4] },
-                          ],
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              {
-                $project: {
-                  _id: 0,
-                  totalRiders: 1,
-                  activeRiders: 1,
-                  totalOngoing: 1,
-                  totalDeliveries: 1,
-                  totalCancelled: 1,
-                  avgDeliveryTime: { $round: ["$avgDeliveryTime", 0] },
-                  avgSuccessRate: { $round: ["$avgSuccessRate", 0] },
-                  avgEfficiencyScore: { $round: ["$avgEfficiencyScore", 0] },
-                },
-              },
-            ],
-            topDeliverymen: [
-              { $sort: { "stats.totalCompleted": -1 } },
-              { $limit: 5 },
-              {
-                $project: {
-                  _id: 0,
-                  name: 1,
-                  email: 1,
-                  totalCompleted: "$stats.totalCompleted",
-                },
-              },
-            ],
-          },
-        },
-      ])
-      .toArray();
-
-    return res.status(200).json({
-      success: true,
-      data: {
-        ...result[0].overview[0],
-        topDeliverymen: result[0].topDeliverymen,
-      },
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
 const getAvailableDeliverymen = async (req, res) => {
   try {
     const { db } = await connectDB();
@@ -456,8 +313,235 @@ const updateDeliveryStatus = async (req, res) => {
   }
 };
 
+const getDeliverymenPerformanceOverview = async (req, res) => {
+  try {
+    const { db } = await connectDB();
+    // console.log(db)
+    const result = await db
+      .collection(DELIVERYMEN_INFO_COLLECTION)
+      .aggregate([
+        {
+          $facet: {
+            overview: [
+              {
+                $group: {
+                  _id: null,
+                  totalRiders: { $sum: 1 },
+                  activeRiders: { $sum: { $cond: ["$isActive", 1, 0] } },
+                  totalDeliveries: { $sum: "$stats.totalCompleted" },
+                  totalOngoing: { $sum: "$stats.totalAssigned" },
+                  totalCancelled: { $sum: "$stats.totalCancelled" },
+                  avgDeliveryTime: { $avg: "$stats.averageDeliveryTime" },
+                  avgSuccessRate: {
+                    $avg: {
+                      $cond: [
+                        { $gt: ["$stats.totalAssigned", 0] },
+                        {
+                          $multiply: [
+                            {
+                              $divide: [
+                                "$stats.totalCompleted",
+                                "$stats.totalAssigned",
+                              ],
+                            },
+                            100,
+                          ],
+                        },
+                        0,
+                      ],
+                    },
+                  },
+                  avgEfficiencyScore: {
+                    $avg: {
+                      $let: {
+                        vars: {
+                          timeScore: {
+                            $max: [
+                              0,
+                              {
+                                $subtract: [
+                                  100,
+                                  {
+                                    $multiply: [
+                                      {
+                                        $divide: [
+                                          {
+                                            $subtract: [
+                                              "$stats.averageDeliveryTime",
+                                              DELIVERY_TIME_TARGET,
+                                            ],
+                                          },
+                                          DELIVERY_TIME_TARGET,
+                                        ],
+                                      },
+                                      100,
+                                    ],
+                                  },
+                                ],
+                              },
+                            ],
+                          },
+                          successScore: {
+                            $cond: [
+                              { $gt: ["$stats.totalAssigned", 0] },
+                              {
+                                $multiply: [
+                                  {
+                                    $divide: [
+                                      "$stats.totalCompleted",
+                                      "$stats.totalAssigned",
+                                    ],
+                                  },
+                                  100,
+                                ],
+                              },
+                              0,
+                            ],
+                          },
+                        },
+                        in: {
+                          $add: [
+                            { $multiply: ["$$successScore", 0.6] },
+                            { $multiply: ["$$timeScore", 0.4] },
+                          ],
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              {
+                $project: {
+                  _id: 0,
+                  totalRiders: 1,
+                  activeRiders: 1,
+                  totalOngoing: 1,
+                  totalDeliveries: 1,
+                  totalCancelled: 1,
+                  avgDeliveryTime: { $round: ["$avgDeliveryTime", 0] },
+                  avgSuccessRate: { $round: ["$avgSuccessRate", 0] },
+                  avgEfficiencyScore: { $round: ["$avgEfficiencyScore", 0] },
+                },
+              },
+            ],
+            topDeliverymen: [
+              { $sort: { "stats.totalCompleted": -1 } },
+              { $limit: 5 },
+              {
+                $project: {
+                  _id: 0,
+                  name: 1,
+                  email: 1,
+                  totalCompleted: "$stats.totalCompleted",
+                },
+              },
+            ],
+          },
+        },
+      ])
+      .toArray();
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        ...result[0].overview[0],
+        topDeliverymen: result[0].topDeliverymen,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getDeliverymanStatsByQuery = async (req, res) => {
+  try {
+    const { db } = await connectDB();
+    const { query } = req.params;
+
+    const deliverymen = await db
+      .collection(DELIVERYMEN_INFO_COLLECTION)
+      .find({
+        $or: [
+          { name: { $regex: query, $options: "i" } },
+          { email: { $regex: query, $options: "i" } },
+        ],
+      })
+      .toArray();
+
+    if (!deliverymen.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No deliveryman found",
+      });
+    }
+
+    const data = deliverymen.map((deliveryman) => {
+      const {
+        totalAssigned,
+        totalCompleted,
+        totalCancelled,
+        averageDeliveryTime,
+        moneyCollected,
+      } = deliveryman.stats;
+
+      const successRate =
+        totalAssigned > 0
+          ? Math.round((totalCompleted / totalAssigned) * 100)
+          : 0;
+
+      const timeScore =
+        averageDeliveryTime > 0
+          ? Math.max(
+              0,
+              100 -
+                ((averageDeliveryTime - DELIVERY_TIME_TARGET) /
+                  DELIVERY_TIME_TARGET) *
+                  100,
+            )
+          : 100;
+
+      const successScore =
+        totalAssigned > 0 ? (totalCompleted / totalAssigned) * 100 : 0;
+
+      const efficiencyScore = Math.round(successScore * 0.6 + timeScore * 0.4);
+
+      return {
+        _id: deliveryman._id,
+        name: deliveryman.name,
+        email: deliveryman.email,
+        phone: deliveryman.phone,
+        isActive: deliveryman.isActive,
+        createdAt: deliveryman.createdAt,
+        stats: {
+          totalAssigned,
+          totalCompleted,
+          totalCancelled,
+          averageDeliveryTime,
+          moneyCollected,
+          successRate,
+          efficiencyScore,
+        },
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getDeliverymenPerformanceOverview,
+  getDeliverymanStatsByQuery,
   getAvailableDeliverymen,
   assignDeliverymanToProduct,
   getAssignedDeliveries,
