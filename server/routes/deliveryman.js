@@ -6,10 +6,13 @@ const {
 	getAssignedDeliveries,
 	updateDeliveryStatus,
 	getDeliverymenPerformanceOverview,
+	getDeliverymanStatsByQuery,
 } = require("../controllers/deliverymanController");
 
 
-router.get("/statistics", getDeliverymenPerformanceOverview)
+router.get("/statistics", getDeliverymenPerformanceOverview);
+router.get("/statistics/:query", getDeliverymanStatsByQuery);
+
 
 router.get("/available", getAvailableDeliverymen);
 router.get("/assigned", getAssignedDeliveries);

@@ -191,6 +191,89 @@ const getDeliverymenPerformanceOverview = async (req, res) => {
   }
 };
 
+const getDeliverymanStatsByQuery = async (req, res) => {
+  try {
+    const { db } = await connectDB();
+    const { query } = req.params;
+
+    const deliverymen = await db
+      .collection(DELIVERYMEN_INFO_COLLECTION)
+      .find({
+        $or: [
+          { name: { $regex: query, $options: "i" } },
+          { email: { $regex: query, $options: "i" } },
+        ],
+      })
+      .toArray();
+
+    if (!deliverymen.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No deliveryman found",
+      });
+    }
+
+    const data = deliverymen.map((deliveryman) => {
+      const {
+        totalAssigned,
+        totalCompleted,
+        totalCancelled,
+        averageDeliveryTime,
+        moneyCollected,
+      } = deliveryman.stats;
+
+      const successRate =
+        totalAssigned > 0
+          ? Math.round((totalCompleted / totalAssigned) * 100)
+          : 0;
+
+      const timeScore =
+        averageDeliveryTime > 0
+          ? Math.max(
+              0,
+              100 -
+                ((averageDeliveryTime - DELIVERY_TIME_TARGET) /
+                  DELIVERY_TIME_TARGET) *
+                  100,
+            )
+          : 100;
+
+      const successScore =
+        totalAssigned > 0 ? (totalCompleted / totalAssigned) * 100 : 0;
+
+      const efficiencyScore = Math.round(successScore * 0.6 + timeScore * 0.4);
+
+      return {
+        _id: deliveryman._id,
+        name: deliveryman.name,
+        email: deliveryman.email,
+        phone: deliveryman.phone,
+        isActive: deliveryman.isActive,
+        createdAt: deliveryman.createdAt,
+        stats: {
+          totalAssigned,
+          totalCompleted,
+          totalCancelled,
+          averageDeliveryTime,
+          moneyCollected,
+          successRate,
+          efficiencyScore,
+        },
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const getAvailableDeliverymen = async (req, res) => {
   try {
     const { db } = await connectDB();
@@ -458,6 +541,7 @@ const updateDeliveryStatus = async (req, res) => {
 
 module.exports = {
   getDeliverymenPerformanceOverview,
+  getDeliverymanStatsByQuery,
   getAvailableDeliverymen,
   assignDeliverymanToProduct,
   getAssignedDeliveries,

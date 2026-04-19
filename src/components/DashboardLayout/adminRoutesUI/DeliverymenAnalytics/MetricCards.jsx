@@ -1,7 +1,7 @@
 
 import DeliverymenMetricCardSkeleton from './DeliverymenMetricCardSkeleton'
 
-function MetricCards({ deliverymenStats, isLoading, isError }) {
+function MetricCards({ deliverymenStats, isLoading }) {
 
     const metricCards = [
         { label: "Total riders", key: "totalRiders", format: (v) => v, badge: `${deliverymenStats.activeRiders} active`, up: null },
@@ -17,7 +17,6 @@ function MetricCards({ deliverymenStats, isLoading, isError }) {
 
         <>
             {isLoading && <DeliverymenMetricCardSkeleton />}
-            {isError && <p className="text-sm text-red-500 col-span-full">{error.message}</p>}
             {!isLoading && metricCards.map(({ label, key, format, sub, badge, up }, i) => (
                 <div key={key} className="relative bg-white dark:bg-neutral-900 border border-border/40 rounded-xl p-4 overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-1 rounded-t-xl" style={{ background: accentColors[i] }} />
