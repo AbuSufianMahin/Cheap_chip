@@ -9,15 +9,11 @@ const {
 	getDeliverymanStatsByQuery,
 } = require("../controllers/deliverymanController");
 
-
-router.get("/statistics", getDeliverymenPerformanceOverview);
-router.get("/statistics/:query", getDeliverymanStatsByQuery);
-
-
 router.get("/available", getAvailableDeliverymen);
 router.get("/assigned", getAssignedDeliveries);
 router.patch("/assign-product", assignDeliverymanToProduct);
 router.patch("/status", updateDeliveryStatus);
-
+router.get("/statistics", getDeliverymenPerformanceOverview);
+router.get("/statistics/:query", getDeliverymanStatsByQuery);
 
 module.exports = router;
