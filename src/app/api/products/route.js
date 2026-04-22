@@ -18,7 +18,7 @@ export async function POST(request) {
     }
 
     // Forward request to backend server
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5001";
     const backendUrl = `${baseUrl}/api/product-lifecycle/create`;
 
     console.log("Sending request to:", backendUrl);
