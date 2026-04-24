@@ -273,6 +273,8 @@ const updateDeliveryStatus = async (req, res) => {
           $set: {
             current_status: status,
             deliveryStatusUpdatedAt: now,
+            ...(status === "picked up" && { "activity_log.pickedAt": now }),
+            ...(status === "delivered" && { "activity_log.deliveredAt": now }),
           },
           $push: {
             deliveryStatusLogs: {
@@ -286,13 +288,32 @@ const updateDeliveryStatus = async (req, res) => {
       );
 
       if (status === "delivered") {
-        await db.collection(deliveryman.collectionName).updateOne(
-          { _id: deliveryman.data._id },
+        const assignedEntry = deliveryman.data.currentlyAssigned.find(
+          (entry) => entry.orderId.toString() === productObjId.toString(),
+        );
+
+        if (!assignedEntry) {
+          throw Object.assign(
+            new Error("Order not found in currentlyAssigned"),
+            { status: 404 },
+          );
+        }
+
+        await db.collection(DELIVERYMEN_INFO_COLLECTION).updateOne(
+          { _id: new ObjectId(deliveryman.data._id) },
           {
             $pull: {
-              currentlyAssigned: {
+              currentlyAssigned: { orderId: productObjId },
+            },
+            $push: {
+              completedDeliveries: {
                 orderId: productObjId,
+                assignedAt: assignedEntry.assignedAt,
+                completedAt: now,
               },
+            },
+            $inc: {
+              "stats.totalCompleted": 1,
             },
           },
           { session },
