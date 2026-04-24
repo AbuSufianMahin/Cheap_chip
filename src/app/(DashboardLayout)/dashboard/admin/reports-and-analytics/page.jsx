@@ -1,4 +1,6 @@
 "use client"
+import OrderDeliveryTrendGraph from '@/components/DashboardLayout/adminRoutesUI/ReportAndAnalytics/OrderDeliveryTrendGraph'
+import UserGrowthGraph from '@/components/DashboardLayout/adminRoutesUI/ReportAndAnalytics/UserGrowthGraph'
 import { Skeleton } from '@/components/ui/skeleton'
 import axiosPublic from '@/lib/axiosPublic'
 import { useQuery } from '@tanstack/react-query'
@@ -21,27 +23,27 @@ const analyticsModules = [
     href: "/dashboard/admin/reports-and-analytics/technician-performance",
     color: "text-purple-700 bg-purple-50",
   },
-  {
-    title: "Order & delivery trends",
-    description: "Daily/weekly volume, peak hours, failed deliveries",
-    icon: <TrendingUp size={24} />,
-    href: "/dashboard/admin/reports-and-analytics/orders",
-    color: "text-blue-700 bg-blue-50",
-  },
-  {
-    title: "Product & inventory",
-    description: "Top products, stock levels, and category performance",
-    icon: <Monitor size={24} />,
-    href: "/dashboard/admin/reports-and-analytics/products",
-    color: "text-amber-700 bg-amber-50",
-  },
-  {
-    title: "User growth",
-    description: "New signups, retention, and active users over time",
-    icon: <UsersRound size={24} />,
-    href: "/dashboard/admin/reports-and-analytics/users",
-    color: "text-rose-700 bg-rose-50",
-  },
+  // {
+  //   title: "Order & delivery trends",
+  //   description: "Daily/weekly volume, peak hours, failed deliveries",
+  //   icon: <TrendingUp size={24} />,
+  //   href: "/dashboard/admin/reports-and-analytics/orders",
+  //   color: "text-blue-700 bg-blue-50",
+  // },
+  // {
+  //   title: "Product & inventory",
+  //   description: "Top products, stock levels, and category performance",
+  //   icon: <Monitor size={24} />,
+  //   href: "/dashboard/admin/reports-and-analytics/products",
+  //   color: "text-amber-700 bg-amber-50",
+  // },
+  // {
+  //   title: "User growth",
+  //   description: "New signups, retention, and active users over time",
+  //   icon: <UsersRound size={24} />,
+  //   href: "/dashboard/admin/reports-and-analytics/users",
+  //   color: "text-rose-700 bg-rose-50",
+  // },
 ]
 
 function page() {
@@ -52,8 +54,6 @@ function page() {
       return result.data.data;
     }
   })
-
-  console.log(websiteData)
 
   const metricCards = [
     {
@@ -157,10 +157,15 @@ function page() {
       </div>
 
 
-      <div className='space-y-4 mt-8'>
-        <h1 className='text-2xl'>Analytics modules</h1>
-
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
+      <div className='flex flex-col-reverse md:flex-col'>
+        <div className='space-y-4 mt-8'>
+          <h1 className='text-2xl'>Analytics modules</h1>
+          <div className='grid xl:grid-cols-3 gap-8'>
+            <UserGrowthGraph isLoading={isLoading} userGrowth={websiteData?.userGrowth} />
+            <OrderDeliveryTrendGraph isLoading={isLoading} orderAndDeliveryTrends={websiteData?.orderAndDeliveryTrends} />
+          </div>
+        </div>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mt-14'>
           {analyticsModules.map(({ title, description, icon, href, color }) => (
             <Link
               key={title}

@@ -4,16 +4,18 @@ const connectDB = require("../utils/db");
 const getPlatformOverviewStats = async (req, res) => {
   try {
     const { db } = await connectDB();
+    const usersCollection = db.collection("users");
     const productsCollection = db.collection("products");
     const deliverymenCollection = db.collection("deliveryman-info");
 
     const now = new Date();
 
-    const thisMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-    const thisMonthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-      
-    const prevMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
-    const prevMonthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const thisMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
 
     const [
       totalOrderCount,
@@ -22,6 +24,8 @@ const getPlatformOverviewStats = async (req, res) => {
       revenue,
       riderStats,
       deliverySuccessStats,
+      orderAndDeliveryTrends,
+      userGrowth,
     ] = await Promise.all([
       productsCollection.countDocuments(),
       productsCollection.countDocuments({
@@ -95,6 +99,77 @@ const getPlatformOverviewStats = async (req, res) => {
           },
         ])
         .toArray(),
+
+      productsCollection
+        .aggregate([
+          {
+            $match: {
+              "activity_log.createdAt": { $gte: sixMonthsAgo },
+              current_status: { $in: ["ordered", "delivered"] },
+            },
+          },
+
+          {
+            $group: {
+              _id: {
+                year: { $year: "$activity_log.createdAt" },
+                month: { $month: "$activity_log.createdAt" },
+              },
+
+              ordered: {
+                $sum: {
+                  $cond: [{ $eq: ["$current_status", "ordered"] }, 1, 0],
+                },
+              },
+
+              delivered: {
+                $sum: {
+                  $cond: [{ $eq: ["$current_status", "delivered"] }, 1, 0],
+                },
+              },
+            },
+          },
+
+          {
+            $project: {
+              _id: 0,
+              year: "$_id.year",
+              month: "$_id.month",
+              ordered: 1,
+              delivered: 1,
+            },
+          },
+
+          { $sort: { year: 1, month: 1 } },
+        ])
+        .toArray(),
+
+      usersCollection
+        .aggregate([
+          { $match: { createdAt: { $gte: sixMonthsAgo } } },
+
+          {
+            $group: {
+              _id: {
+                year: { $year: "$createdAt" },
+                month: { $month: "$createdAt" },
+              },
+              users: { $sum: 1 },
+            },
+          },
+
+          {
+            $project: {
+              _id: 0,
+              year: "$_id.year",
+              month: "$_id.month",
+              users: 1,
+            },
+          },
+
+          { $sort: { year: 1, month: 1 } },
+        ])
+        .toArray(),
     ]);
 
     let growth = null;
@@ -122,6 +197,8 @@ const getPlatformOverviewStats = async (req, res) => {
         growthAmount: growth,
         growthDirection: direction,
       },
+      orderAndDeliveryTrends,
+      userGrowth,
 
       revenue: revenue.length > 0 ? revenue[0].total : 0,
 
