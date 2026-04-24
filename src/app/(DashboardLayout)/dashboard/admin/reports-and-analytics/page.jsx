@@ -1,4 +1,7 @@
 "use client"
+import { Skeleton } from '@/components/ui/skeleton'
+import axiosPublic from '@/lib/axiosPublic'
+import { useQuery } from '@tanstack/react-query'
 import { Monitor, TrendingUp, Users, UsersRound, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import CountUp from 'react-countup'
@@ -42,18 +45,55 @@ const analyticsModules = [
 ]
 
 function page() {
-  const analyticsOverviewData = {
-    totalOrders: 1240,
-    revenue: 84500,
-    activeRiders: 5,
-    deliverySuccess: 91,
-  }
+  const { data: websiteData = {}, isLoading } = useQuery({
+    queryKey: ["website-analytics-data"],
+    queryFn: async () => {
+      const result = await axiosPublic.get("/api/statistics/overview");
+      return result.data.data;
+    }
+  })
+
+  console.log(websiteData)
+
   const metricCards = [
-    { label: "Total orders", key: "totalOrders", unit: null, trend: "+12% vs last month", up: true },
-    { label: "Revenue", key: "revenue", unit: "৳", trend: "+8% vs last month", up: true },
-    { label: "Active riders", key: "activeRiders", unit: null, trend: "of 6 total", up: null },
-    { label: "Delivery success", key: "deliverySuccess", unit: null, trend: "-2% vs last month", up: false },
-  ]
+    {
+      label: "Total orders",
+      getValue: (d) => d.orderCounts.totalOrders,
+      getTrend: (d) =>
+        d.orderCounts.growthDirection === "neutral" ?
+          "0% vs last month"
+          :
+          `${d.orderCounts.growthDirection === "up" ? "+" : "-"}${d.orderCounts.growthAmount}% vs last month`,
+
+      getUp: (d) =>
+        d.orderCounts.growthDirection === "neutral"
+          ? null
+          : d.orderCounts.growthDirection === "up",
+    },
+    {
+      label: "Revenue",
+      getValue: (d) => d.revenue,
+      unit: "৳",
+      getTrend: () => "Total earned",
+      getUp: () => null,
+    },
+    {
+      label: "Active riders",
+      getValue: (d) => d.riderCounts.active,
+      getTrend: (d) => `of ${d.riderCounts.total} total`,
+      getUp: () => null,
+    },
+    {
+      label: "Delivery success",
+      getValue: (d) => d.deliverySuccessRate,
+      unit: "%",
+      getTrend: () => "Success rate",
+      getUp: () => null,
+    },
+  ];
+
+  const accentColors = ["#85B7EB", "#5DCAA5", "#F0997B", "#AFA9EC"]
+
 
   return (
     <section>
@@ -63,23 +103,59 @@ function page() {
         </h1>
         <p className='text-sm text-muted-foreground'>Overview of platform performance</p>
       </div>
-
       <div className='space-y-2 mt-5'>
-        <p className='text-sm text-muted-foreground'>Demo Summary Data</p>
+        <p className='text-sm text-muted-foreground'>Summary Data</p>
+
         <div className='grid grid-cols-2 xl:grid-cols-6 gap-2 lg:gap-4'>
-          {metricCards.map(({ label, key, format, trend, up }) => (
-            <div key={key} className="bg-muted/50 rounded-sm p-3 md:p-4 lg:p-6 shadow">
-              <p className="text-xs text-muted-foreground mb-1.5">{label}</p>
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold">
-                <CountUp end={analyticsOverviewData[key]} duration={5} />
-              </p>
-              <p className={`text-xs mt-1 ${up == null ? "text-muted-foreground" : up == true ? "text-green-700" : "text-red-700"}`}>
-                {trend}
-              </p>
-            </div>
-          ))}
+          {
+            isLoading ?
+              <>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="relative bg-muted/50 rounded-lg p-3 md:p-4 lg:p-6 shadow">
+                    <Skeleton className="absolute top-0 left-0 right-0 h-1 rounded-none" />
+                    <Skeleton className="h-3.5 w-24 mb-1.5" />
+                    <Skeleton className="h-8 w-24 mt-2" />
+                    <Skeleton className="h-3.5 w-28 mt-2" />
+                  </div>
+                ))}
+              </>
+              :
+
+              <>
+                {metricCards.map(({ label, unit, getValue, getTrend, getUp }, i) => {
+                  const d = websiteData;
+                  const value = getValue(d);
+                  const trend = getTrend(d);
+                  const up = getUp(d);
+                  return (
+                    <div key={label} className="relative bg-muted/50 rounded-lg p-3 md:p-4 lg:p-6 shadow overflow-hidden">
+                      <div className="absolute top-0 left-0 right-0 h-1 rounded-t-sm" style={{ background: accentColors[i] }} />
+                      <p className="text-xs text-muted-foreground mb-1.5">{label}</p>
+                      <p className="text-xl sm:text-2xl md:text-3xl font-bold">
+                        {unit && unit !== "%" && <span>{unit}</span>}
+                        <CountUp end={value} duration={5} />
+                        {unit === "%" && <span>{unit}</span>}
+                      </p>
+                      <p className={`text-xs mt-1 ${up == null
+                        ? "text-muted-foreground"
+                        : up === true
+                          ? "text-green-700"
+                          : "text-red-700"
+                        } ${up == null && getTrend(d) === "0% vs last month" ? "text-yellow-600" : ""}`}>
+                        {trend}
+                      </p>
+                    </div>
+                  );
+                })}
+
+              </>
+
+          }
+
         </div>
+
       </div>
+
 
       <div className='space-y-4 mt-8'>
         <h1 className='text-2xl'>Analytics modules</h1>

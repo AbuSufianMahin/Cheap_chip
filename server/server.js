@@ -52,6 +52,8 @@ const spamController = rateLimit({
   legacyHeaders: false,
 });
 
+app.use("/api/statistics", require("./routes/platformOverview"))
+
 // routes
 app.use("/api/authentication", spamController, require("./routes/authentication"));
 
