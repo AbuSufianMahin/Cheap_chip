@@ -62,7 +62,7 @@ function AvailableTechniciansDialogue({ product }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Assign Technician</Button>
+        <Button variant="outline" className={"flex-1"}>Assign Technician</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl" aria-describedby={undefined}>
         <DialogHeader>

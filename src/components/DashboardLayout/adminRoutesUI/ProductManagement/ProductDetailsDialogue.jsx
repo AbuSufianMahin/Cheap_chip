@@ -3,6 +3,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
 } from '@/components/ui/dialog';
 import Image from 'next/image';
 import { Check, ArrowRight } from "lucide-react";
@@ -39,26 +40,25 @@ function ProductDetailsDialogue({ productObjToShow, setProductObjToshow }) {
         }
     });
 
-    const { data: technicianData = {}, isLoading: isTechnicianLoading } = useQuery({
-        queryKey: ["assigned-technician-data", productObjToShow?.assignedTechnician],
-        enabled: !!productObjToShow?.assignedTechnician,
-        queryFn: async () => {
-            const result = await axiosPublic.get(`/api/technician/${productObjToShow.assignedTechnician}`);
-            return result.data.data;
-        }
-    });
+    // const { data: technicianData = {}, isLoading: isTechnicianLoading } = useQuery({
+    //     queryKey: ["assigned-technician-data", productObjToShow?.assignedTechnician],
+    //     enabled: !!productObjToShow?.assignedTechnician,
+    //     queryFn: async () => {
+    //         const result = await axiosPublic.get(`/api/technician/${productObjToShow.assignedTechnician}`);
+    //         return result.data.data;
+    //     }
+    // });
 
-
-    console.log(deliverymanData)
+    // console.log(deliverymanData)
 
     return (
         <Dialog open={!!productObjToShow} onOpenChange={(open) => { if (!open) setProductObjToshow(null) }} >
             <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
                     <DialogTitle>{productObjToShow?.productName}</DialogTitle>
-                    <p className="text-xs text-muted-foreground">
+                    <DialogDescription className="text-xs text-muted-foreground">
                         Tracking ID: <span className="font-medium text-foreground">{productObjToShow?.trackingId}</span>
-                    </p>
+                    </DialogDescription>
                 </DialogHeader>
 
                 {/* Image */}
@@ -69,6 +69,7 @@ function ProductDetailsDialogue({ productObjToShow, setProductObjToshow }) {
                             "https://res.cloudinary.com/dsos8ty6s/image/upload/q_auto/f_auto/v1777143751/no-image-icon-23485_im59ix.png"
                         }
                         fill
+                        sizes="(max-width: 640px) 100vw, 100vw"
                         className="rounded-md object-contain"
                         alt={`${productObjToShow?.productName} image`}
                     />
@@ -76,7 +77,7 @@ function ProductDetailsDialogue({ productObjToShow, setProductObjToshow }) {
 
                 {/* Delivery status stepper */}
                 <div className="w-full">
-                    <p className="text-sm text-muted-foreground uppercase tracking-wide mb-4">
+                    <p className="text-sm font-semibold uppercase tracking-wide mb-4 ml-2">
                         Delivery status
                     </p>
 
@@ -164,33 +165,35 @@ function ProductDetailsDialogue({ productObjToShow, setProductObjToshow }) {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className='space-y-2'>
+                    <h2 className='text-sm font-semibold uppercase tracking-wide ml-2'>Assigned Employees</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                    {/* Deliveryman */}
-                    {productObjToShow?.assignedDeliveryman && (
-                        <div className="bg-muted rounded-md px-3 py-2">
-                            <p className="text-[11px] text-muted-foreground">Delivery Man</p>
+                        {/* Deliveryman */}
+                        {productObjToShow?.assignedDeliveryman && (
+                            <div className="bg-muted rounded-md px-3 py-2">
+                                <p className="text-[11px] text-muted-foreground">Delivery Man</p>
 
-                            {isDeliverymanLoading ? (
-                                <div className="mt-2 space-y-2">
-                                    <Skeleton className="h-4 w-28" />
-                                    <Skeleton className="h-3 w-36" />
-                                </div>
-                            ) : (
-                                <>
-                                    <p className="text-sm font-medium">
-                                        {deliverymanData?.name}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {deliverymanData?.email}
-                                    </p>
-                                </>
-                            )}
-                        </div>
-                    )}
+                                {isDeliverymanLoading ? (
+                                    <div className="mt-2 space-y-2">
+                                        <Skeleton className="h-4 w-28" />
+                                        <Skeleton className="h-3 w-36" />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p className="text-sm font-medium">
+                                            {deliverymanData?.name}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {deliverymanData?.email}
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                        )}
 
-                    {/* Technician */}
-                    {/* {productObjToShow?.assignedTechnician && (
+                        {/* Technician */}
+                        {/* {productObjToShow?.assignedTechnician && (
                         <div className="bg-muted rounded-md px-3 py-2">
                             <p className="text-[11px] text-muted-foreground">Technician</p>
                             <p className="text-sm font-medium">
@@ -201,6 +204,7 @@ function ProductDetailsDialogue({ productObjToShow, setProductObjToshow }) {
                             </p>
                         </div>
                     )} */}
+                    </div>
                 </div>
             </DialogContent>
         </Dialog>

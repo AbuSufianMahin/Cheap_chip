@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { debounce } from 'lodash';
 import ProductDetailsDialogue from '@/components/DashboardLayout/adminRoutesUI/ProductManagement/ProductDetailsDialogue';
+import { Button } from '@/components/ui/button';
 
 function page() {
   const {
@@ -73,7 +74,7 @@ function page() {
             checked={onlyUnassigned}
             onCheckedChange={(checked) => setOnlyUnassigned(checked === true)}
           />
-          <Label htmlFor="unassigned">Unassigned only</Label>
+          <Label htmlFor="unassigned">Unassigned deliveryman only</Label>
         </div>
       </div>
       <div className="py-6 space-y-6">
@@ -120,16 +121,22 @@ function page() {
                         </span>
                       </p>
                     </div>
-                    <div className='flex gap-2 flex-wrap xl:w-fit'>
+                    <div className='flex flex-col gap-2'>
+
                       {
-                        product.assignedDeliveryman === null &&
-                        <AvailableRidersDialogue product={product} />
+                        product.assignedDeliveryman === null ?
+                          <AvailableRidersDialogue product={product} />
+                          :
+                          <Button disabled className="bg-gray-400">Deliveryman assigned</Button>
                       }
 
                       {
-                        product.assignedTechnician === null &&
-                        <AvailableTechniciansDialogue product={product} />
+                        product.assignedTechnician === null ?
+                          <AvailableTechniciansDialogue product={product} />
+                          :
+                          <Button disabled className="bg-gray-400" >Technician assigned</Button>
                       }
+
                     </div>
                   </div>
                 </div>
