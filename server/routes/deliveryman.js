@@ -7,8 +7,10 @@ const {
 	updateDeliveryStatus,
 	getDeliverymenPerformanceOverview,
 	getDeliverymanStatsByQuery,
+	getDeliverymanByID,
 } = require("../controllers/deliverymanController");
 
+router.get("/:deliverymanObjectID", getDeliverymanByID);
 router.get("/available", getAvailableDeliverymen);
 router.get("/assigned", getAssignedDeliveries);
 router.patch("/assign-product", assignDeliverymanToProduct);

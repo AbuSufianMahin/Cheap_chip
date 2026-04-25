@@ -3,12 +3,16 @@ const connectDB = require("../utils/db");
 const getAllProductInfo = async (req, res) => {
   try {
     const { db } = await connectDB();
-    const onlyUnassigned = req.query.unassigned;
+    const { unassigned, productName } = req.query;
 
     let dbSearchQuery = {};
 
-    if (onlyUnassigned === "true") {
+    if (unassigned === "true") {
       dbSearchQuery.assignedDeliveryman = null;
+    }
+
+    if (productName && productName.trim().length >= 3) {
+      dbSearchQuery.productName = { $regex: productName.trim(), $options: "i" };
     }
 
     const products = await db

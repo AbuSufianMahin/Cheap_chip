@@ -81,6 +81,51 @@ const getAvailableDeliverymen = async (req, res) => {
   }
 };
 
+const getDeliverymanByID = async (req, res) => {
+  try {
+    const { db } = await connectDB();
+
+    const { deliverymanObjectID } = req.params;
+
+    // validate ObjectId
+    if (!ObjectId.isValid(deliverymanObjectID)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid deliveryman ID",
+      });
+    }
+
+    const query = { _id: new ObjectId(deliverymanObjectID) };
+
+    const deliveryman = await db
+      .collection(DELIVERYMEN_INFO_COLLECTION)
+      .findOne(query, {
+        projection: {
+          password: 0,
+          refreshToken: 0,
+        },
+      });
+
+    if (!deliveryman) {
+      return res.status(404).json({
+        success: false,
+        message: "Deliveryman not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: deliveryman,
+    });
+  } catch (error) {
+    console.error("getDeliverymanByID error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 const assignDeliverymanToProduct = async (req, res) => {
   const { productId, deliverymanId } = req.body;
 
@@ -561,6 +606,7 @@ const getDeliverymanStatsByQuery = async (req, res) => {
 };
 
 module.exports = {
+  getDeliverymanByID,
   getDeliverymenPerformanceOverview,
   getDeliverymanStatsByQuery,
   getAvailableDeliverymen,
