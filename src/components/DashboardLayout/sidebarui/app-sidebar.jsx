@@ -116,6 +116,10 @@ const navMain = [
         title: "Product Management",
         url: "/dashboard/admin/product-management",
       },
+      {
+        title: "Pay Salary",
+        url: "/dashboard/admin/pay-salary",
+      },
     ],
   },
 

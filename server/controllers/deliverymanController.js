@@ -222,6 +222,51 @@ const getAvailableDeliverymen = async (req, res) => {
   }
 };
 
+const getDeliverymanByID = async (req, res) => {
+  try {
+    const { db } = await connectDB();
+
+    const { deliverymanObjectID } = req.params;
+
+    // validate ObjectId
+    if (!ObjectId.isValid(deliverymanObjectID)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid deliveryman ID",
+      });
+    }
+
+    const query = { _id: new ObjectId(deliverymanObjectID) };
+
+    const deliveryman = await db
+      .collection(DELIVERYMEN_INFO_COLLECTION)
+      .findOne(query, {
+        projection: {
+          password: 0,
+          refreshToken: 0,
+        },
+      });
+
+    if (!deliveryman) {
+      return res.status(404).json({
+        success: false,
+        message: "Deliveryman not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: deliveryman,
+    });
+  } catch (error) {
+    console.error("getDeliverymanByID error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
 const assignDeliverymanToProduct = async (req, res) => {
   const { productId, deliverymanId } = req.body;
 
@@ -414,6 +459,8 @@ const updateDeliveryStatus = async (req, res) => {
           $set: {
             current_status: status,
             deliveryStatusUpdatedAt: now,
+            ...(status === "picked up" && { "activity_log.pickedAt": now }),
+            ...(status === "delivered" && { "activity_log.deliveredAt": now }),
           },
           $push: {
             deliveryStatusLogs: {
@@ -427,13 +474,32 @@ const updateDeliveryStatus = async (req, res) => {
       );
 
       if (status === "delivered") {
-        await db.collection(deliveryman.collectionName).updateOne(
-          { _id: deliveryman.data._id },
+        const assignedEntry = deliveryman.data.currentlyAssigned.find(
+          (entry) => entry.orderId.toString() === productObjId.toString(),
+        );
+
+        if (!assignedEntry) {
+          throw Object.assign(
+            new Error("Order not found in currentlyAssigned"),
+            { status: 404 },
+          );
+        }
+
+        await db.collection(DELIVERYMEN_INFO_COLLECTION).updateOne(
+          { _id: new ObjectId(deliveryman.data._id) },
           {
             $pull: {
-              currentlyAssigned: {
+              currentlyAssigned: { orderId: productObjId },
+            },
+            $push: {
+              completedDeliveries: {
                 orderId: productObjId,
+                assignedAt: assignedEntry.assignedAt,
+                completedAt: now,
               },
+            },
+            $inc: {
+              "stats.totalCompleted": 1,
             },
           },
           { session },
@@ -778,6 +844,7 @@ const getDeliverymanStatsByQuery = async (req, res) => {
 };
 
 module.exports = {
+  getDeliverymanByID,
   getDeliverymenPerformanceOverview,
   getDeliverymanStatsByQuery,
   getAvailableDeliverymen,

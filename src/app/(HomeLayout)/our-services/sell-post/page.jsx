@@ -150,7 +150,7 @@ function OurServices() {
       <div className="w-full max-w-2xl mx-auto">
         {/* Header Section */}
         <div className="mb-10 text-center">
-          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold mb-3 bg-linear-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
             Create Your Sell Post
           </h1>
           <p className="text-lg text-gray-600 leading-relaxed">

@@ -33,7 +33,7 @@ function SearchDeliverymenStats() {
         }, 300),
         []
     )
-    console.log(deliverymenData)
+    // console.log(deliverymenData)
 
     return (
         <section className='space-y-4'>
