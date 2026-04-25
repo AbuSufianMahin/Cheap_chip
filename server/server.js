@@ -59,6 +59,7 @@ app.use("/api/authentication", spamController, require("./routes/authentication"
 app.use("/api/riders-overview", require("./routes/ridersOverview"));
 
 app.use("/api/deliverymen", require("./routes/deliveryman"))
+app.use("/api/technicians", require("./routes/technician"));
 
 
 // product apis

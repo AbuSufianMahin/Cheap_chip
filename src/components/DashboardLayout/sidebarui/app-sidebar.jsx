@@ -51,8 +51,8 @@ const navMain = [
         url: "/dashboard/technician/assigned",
       },
       {
-        title: "In Progress",
-        url: "/dashboard/technician/in-progress",
+        title: "All Products",
+        url: "/dashboard/technician/all-products",
       },
       {
         title: "Completed Jobs",

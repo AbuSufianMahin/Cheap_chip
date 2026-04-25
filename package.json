@@ -23,6 +23,7 @@
     "lodash": "^4.18.1",
     "lottie-react": "^2.4.1",
     "lucide-react": "^1.8.0",
+    "maplibre-gl": "^5.24.0",
     "mongodb": "^7.1.0",
     "next": "^16.2.2",
     "next-auth": "^5.0.0-beta.30",
