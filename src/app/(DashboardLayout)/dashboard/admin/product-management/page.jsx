@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 
 import AvailableRidersDialogue from '@/components/DashboardLayout/adminRoutesUI/AvailableRidersDialogue';
+import AvailableTechniciansDialogue from '@/components/DashboardLayout/adminRoutesUI/AvailableTechniciansDialogue';
 import ProductLoadingSkeleton from '@/components/DashboardLayout/adminRoutesUI/ProductLoadingSkeleton';
 
 function page() {
@@ -79,12 +80,17 @@ function page() {
                         </span>
                       </p>
                     </div>
-                    {
-                      product.assignedDeliveryman === null &&
-                      <div className='xl:w-fit'>
+                    <div className='flex gap-2 flex-wrap xl:w-fit'>
+                      {
+                        product.assignedDeliveryman === null &&
                         <AvailableRidersDialogue product={product} />
-                      </div>
-                    }
+                      }
+
+                      {
+                        product.assignedTechnician === null &&
+                        <AvailableTechniciansDialogue product={product} />
+                      }
+                    </div>
                   </div>
                 </div>
               ))
