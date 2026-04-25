@@ -1,9 +1,15 @@
 const { ObjectId } = require("mongodb");
+const { randomUUID } = require("crypto");
 const connectDB = require("../utils/db");
 
 const DELIVERYMEN_INFO_COLLECTION = "deliveryman-info";
 const PRODUCTS_COLLECTION = "products";
 const DELIVERY_TIME_TARGET = 20;
+const MAPTILER_GEOCODING_BASE = "https://api.maptiler.com/geocoding";
+const MAPTILER_STATIC_MAP_BASE = "https://api.maptiler.com/maps/streets-v2/static";
+
+const locationCoordinateCache = new Map();
+const routeMapImageTokenStore = new Map();
 
 const ALLOWED_DELIVERY_STATUSES = [
   "on the way",
@@ -14,6 +20,141 @@ const ALLOWED_DELIVERY_STATUSES = [
 
 function normalizeEmail(value) {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
+function normalizeLocation(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function getLocationText(value) {
+  if (typeof value === "string") {
+    return value.trim();
+  }
+
+  if (value && typeof value === "object") {
+    return normalizeLocation(value.address || value.name || value.label || value.value);
+  }
+
+  return "";
+}
+
+function getLocationCoordinates(value) {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const lat = Number(value.coordinates?.lat ?? value.lat ?? value.latitude);
+  const lng = Number(value.coordinates?.lng ?? value.lng ?? value.longitude);
+
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    return { lat, lng };
+  }
+
+  return null;
+}
+
+function getActiveTargetLocation(product) {
+  const pickupLocationValue = product?.pickupLocation;
+  const deliveryLocationValue = product?.productLocation || product?.location;
+  const pickupLocation = getLocationText(pickupLocationValue);
+  const deliveryLocation = getLocationText(deliveryLocationValue);
+  const pickupCoordinates = getLocationCoordinates(pickupLocationValue);
+  const deliveryCoordinates = getLocationCoordinates(deliveryLocationValue);
+  const currentStatus = (product?.current_status || "").toLowerCase();
+
+  if (currentStatus === "picked up" || currentStatus === "in store house") {
+    return {
+      type: "delivery",
+      label: "Delivery location",
+      value: deliveryLocation || pickupLocation,
+      coordinates: deliveryCoordinates,
+    };
+  }
+
+  return {
+    type: "pickup",
+    label: "Pickup location",
+    value: pickupLocation || deliveryLocation,
+    coordinates: pickupCoordinates,
+  };
+}
+
+async function geocodeLocation(locationText, apiKey) {
+  const cacheKey = locationText.toLowerCase();
+
+  if (locationCoordinateCache.has(cacheKey)) {
+    return locationCoordinateCache.get(cacheKey);
+  }
+
+  const geocodeUrl = `${MAPTILER_GEOCODING_BASE}/${encodeURIComponent(locationText)}.json?key=${encodeURIComponent(apiKey)}&limit=1`;
+
+  const response = await fetch(geocodeUrl);
+  if (!response.ok) {
+    throw new Error(`Geocoding failed with status ${response.status}`);
+  }
+
+  const geocodeResult = await response.json();
+  const [lng, lat] = geocodeResult?.features?.[0]?.center || [];
+
+  if (typeof lat !== "number" || typeof lng !== "number") {
+    throw new Error("No coordinates found for the selected location");
+  }
+
+  const coordinateData = { lat, lng };
+  locationCoordinateCache.set(cacheKey, coordinateData);
+  return coordinateData;
+}
+
+async function getAssignedProductForDeliveryman(db, email, productId) {
+  const deliveryman = await findDeliverymanByEmail(db, email);
+
+  if (!deliveryman?.data?._id) {
+    throw Object.assign(new Error("Deliveryman not found"), { status: 404 });
+  }
+
+  const product = await db
+    .collection(PRODUCTS_COLLECTION)
+    .findOne({ _id: new ObjectId(productId) });
+
+  if (!product) {
+    throw Object.assign(new Error("Product not found"), { status: 404 });
+  }
+
+  if (
+    !product.assignedDeliveryman ||
+    product.assignedDeliveryman.toString() !== deliveryman.data._id.toString()
+  ) {
+    throw Object.assign(new Error("This product is not assigned to you"), {
+      status: 403,
+    });
+  }
+
+  return product;
+}
+
+function createRouteMapImageToken({ lat, lng }) {
+  const token = randomUUID();
+  routeMapImageTokenStore.set(token, {
+    lat,
+    lng,
+    expiresAt: Date.now() + 5 * 60 * 1000,
+  });
+  return token;
+}
+
+function readRouteMapImageToken(token) {
+  const tokenInfo = routeMapImageTokenStore.get(token);
+
+  if (!tokenInfo) {
+    return null;
+  }
+
+  if (Date.now() > tokenInfo.expiresAt) {
+    routeMapImageTokenStore.delete(token);
+    return null;
+  }
+
+  return tokenInfo;
 }
 
 async function findDeliverymanByEmail(db, email, session) {
@@ -313,6 +454,103 @@ const updateDeliveryStatus = async (req, res) => {
   }
 };
 
+const getAssignedDeliveryRouteMap = async (req, res) => {
+  try {
+    const { db } = await connectDB();
+    const productId = typeof req.query.productId === "string" ? req.query.productId.trim() : "";
+    const email = normalizeEmail(req.query.email);
+    const maptilerApiKey = process.env.MAPTILER_API_KEY;
+
+    if (!productId || !email) {
+      return res
+        .status(400)
+        .json({ message: "productId and email query parameters are required" });
+    }
+
+    if (!ObjectId.isValid(productId)) {
+      return res.status(400).json({ message: "Invalid productId" });
+    }
+
+    if (!maptilerApiKey) {
+      return res
+        .status(500)
+        .json({ message: "Map service is not configured on the server" });
+    }
+
+    const product = await getAssignedProductForDeliveryman(db, email, productId);
+    const targetLocation = getActiveTargetLocation(product);
+
+    if (!targetLocation.value) {
+      return res
+        .status(400)
+        .json({ message: "No location found for this assigned product" });
+    }
+
+    const coordinates = targetLocation.coordinates || (await geocodeLocation(targetLocation.value, maptilerApiKey));
+    const imageToken = createRouteMapImageToken(coordinates);
+    const imageEndpoint = `/api/deliverymen/route-map/image?token=${encodeURIComponent(imageToken)}`;
+
+    return res.status(200).json({
+      productId,
+      currentStatus: product.current_status || "assigned",
+      targetType: targetLocation.type,
+      targetLabel: targetLocation.label,
+      targetAddress: targetLocation.value,
+      coordinates,
+      imageEndpoint,
+    });
+  } catch (error) {
+    console.error("Get assigned delivery route map error:", error);
+    return res.status(error.status || 500).json({
+      message: error.message || "Failed to load route map",
+    });
+  }
+};
+
+const getAssignedDeliveryRouteMapImage = async (req, res) => {
+  try {
+    const token = typeof req.query.token === "string" ? req.query.token.trim() : "";
+    const maptilerApiKey = process.env.MAPTILER_API_KEY;
+
+    if (!token) {
+      return res.status(400).json({ message: "token query parameter is required" });
+    }
+
+    if (!maptilerApiKey) {
+      return res
+        .status(500)
+        .json({ message: "Map service is not configured on the server" });
+    }
+
+    const tokenInfo = readRouteMapImageToken(token);
+    if (!tokenInfo) {
+      return res.status(410).json({ message: "Map token is invalid or expired" });
+    }
+
+    const { lat, lng } = tokenInfo;
+    const marker = `${lng},${lat},red`;
+    const staticMapUrl = `${MAPTILER_STATIC_MAP_BASE}/${lng},${lat},14/900x420.png?markers=${encodeURIComponent(marker)}&key=${encodeURIComponent(maptilerApiKey)}`;
+
+    const mapImageResponse = await fetch(staticMapUrl);
+
+    if (!mapImageResponse.ok) {
+      throw new Error(`Map image request failed with status ${mapImageResponse.status}`);
+    }
+
+    const imageBuffer = Buffer.from(await mapImageResponse.arrayBuffer());
+
+    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Cache-Control", "private, max-age=300");
+
+    return res.status(200).send(imageBuffer);
+  } catch (error) {
+    console.error("Get assigned delivery route map image error:", error);
+    return res.status(error.status || 500).json({
+      message: error.message || "Failed to render route map image",
+    });
+  }
+};
+
 const getDeliverymenPerformanceOverview = async (req, res) => {
   try {
     const { db } = await connectDB();
@@ -546,4 +784,6 @@ module.exports = {
   assignDeliverymanToProduct,
   getAssignedDeliveries,
   updateDeliveryStatus,
+  getAssignedDeliveryRouteMap,
+  getAssignedDeliveryRouteMapImage,
 };
