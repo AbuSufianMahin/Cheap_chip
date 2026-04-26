@@ -51,8 +51,8 @@ const navMain = [
         url: "/dashboard/technician/assigned",
       },
       {
-        title: "In Progress",
-        url: "/dashboard/technician/in-progress",
+        title: "All Products",
+        url: "/dashboard/technician/all-products",
       },
       {
         title: "Completed Jobs",
@@ -115,6 +115,10 @@ const navMain = [
       {
         title: "Product Management",
         url: "/dashboard/admin/product-management",
+      },
+      {
+        title: "Pay Salary",
+        url: "/dashboard/admin/pay-salary",
       },
     ],
   },

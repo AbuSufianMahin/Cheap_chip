@@ -1,4 +1,3 @@
-
 import DeliverymenMetricCardSkeleton from './DeliverymenMetricCardSkeleton'
 
 function MetricCards({ deliverymenStats, isLoading }) {

@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import axiosPublic from "@/lib/axiosPublic";
 import { Button } from "@/components/ui/button";
+import DeliveryRouteMap from "./DeliveryRouteMap";
 
 const ALLOWED_STATUSES = ["on the way", "picked up", "delivered", "in Store house"];
 
@@ -35,6 +36,7 @@ export default function DeliveryAssignmentsBoard({
 }) {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
+  const [openRouteMapFor, setOpenRouteMapFor] = useState(null);
 
   const deliveryEmail = useMemo(
     () => session?.user?.email?.trim()?.toLowerCase() || "",
@@ -77,6 +79,21 @@ export default function DeliveryAssignmentsBoard({
     },
   });
 
+  const {
+    data: routeMapData,
+    isFetching: isMapLoading,
+    isError: isMapError,
+  } = useQuery({
+    queryKey: ["delivery-route-map", deliveryEmail, openRouteMapFor],
+    enabled: Boolean(deliveryEmail && openRouteMapFor),
+    queryFn: async () => {
+      const response = await axiosPublic.get(
+        `/api/deliverymen/route-map?email=${encodeURIComponent(deliveryEmail)}&productId=${encodeURIComponent(openRouteMapFor)}`,
+      );
+      return response.data;
+    },
+  });
+
   return (
     <section className="space-y-4">
       <div>
@@ -103,8 +120,8 @@ export default function DeliveryAssignmentsBoard({
           <article key={delivery._id} className="rounded-xl border bg-white p-4 space-y-3">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h2 className="text-base font-semibold">{delivery.name || "Product"}</h2>
-                <p className="text-sm text-muted-foreground">{delivery.description || "No description"}</p>
+                <h2 className="text-base font-semibold">{delivery.productName || delivery.name || "Product"}</h2>
+                <p className="text-sm text-muted-foreground">{delivery.productDescription || delivery.description || "No description"}</p>
               </div>
               <StatusBadge status={delivery.current_status} />
             </div>
@@ -115,8 +132,48 @@ export default function DeliveryAssignmentsBoard({
                 {typeof delivery.askingPrice === "number" ? `৳${delivery.askingPrice}` : "N/A"}
               </p>
               <p>
-                <span className="font-medium">Location:</span> {delivery.location || "N/A"}
+                <span className="font-medium">Location:</span> {delivery.productLocation || delivery.pickupLocation || delivery.location || "N/A"}
               </p>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium">Route map</p>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setOpenRouteMapFor((current) =>
+                      current === delivery._id ? null : delivery._id,
+                    )
+                  }
+                >
+                  {openRouteMapFor === delivery._id ? "Hide map" : "View map"}
+                </Button>
+              </div>
+
+              {openRouteMapFor === delivery._id && (
+                <div className="mt-3 space-y-2">
+                  {isMapLoading && (
+                    <p className="text-sm text-muted-foreground">Loading route map...</p>
+                  )}
+
+                  {isMapError && (
+                    <p className="text-sm text-red-500">
+                      Unable to load map for this delivery right now.
+                    </p>
+                  )}
+
+                  {!isMapLoading && !isMapError && routeMapData && (
+                    <>
+                      <p className="text-sm">
+                        <span className="font-medium">{routeMapData.targetLabel}:</span>{" "}
+                        {routeMapData.targetAddress}
+                      </p>
+                      <DeliveryRouteMap coordinates={routeMapData.coordinates} />
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
             {allowStatusUpdate && (

@@ -54,7 +54,7 @@ function AvailableRidersDialogue({ product }) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild >
-                <Button variant='outline' >Assign Deliveryman</Button>
+                <Button variant='outline' className={"flex-1"}>Assign Deliveryman</Button>
             </DialogTrigger>
             <DialogContent className={"sm:max-w-2xl"} aria-describedby={undefined}>
                 <DialogHeader>

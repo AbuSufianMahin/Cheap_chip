@@ -153,7 +153,7 @@ function BuyProducts() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-br from-white via-blue-50 to-blue-100 py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -168,7 +168,7 @@ function BuyProducts() {
               Browse Computer Chips
             </div>
 
-            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <h1 className="text-5xl font-bold mb-4 bg-linear-to-rrom-blue-600 to-blue-800 bg-clip-text text-transparent">
               Find Your Perfect Computer Chips
             </h1>
 
@@ -319,7 +319,7 @@ function BuyProducts() {
         {error && (
           <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-8 mb-12">
             <div className="flex items-start gap-4">
-              <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+              <AlertCircle className="w-6 h-6 text-red-600 shrink-0 mt-1" />
               <div>
                 <h3 className="text-lg font-bold text-red-800 mb-2">Failed to Load Products</h3>
                 <p className="text-red-700 mb-4">{error}</p>
@@ -337,7 +337,7 @@ function BuyProducts() {
             {filteredProducts.map((product) => (
               <Card key={product._id} className="overflow-hidden hover:shadow-2xl transition-all duration-300 border-blue-200">
                 {/* Product Image */}
-                <div className="h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center text-6xl">
+                <div className="h-48 bg-linear-to-br from-blue-100 to-blue-200 flex items-center justify-center text-6xl">
                   {product.productImage ? (
                     <img
                       src={product.productImage}
