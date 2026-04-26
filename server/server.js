@@ -73,6 +73,11 @@ app.use("/api/products-info", require("./routes/allProducts"));
 // Job application apis
 app.use('/api/job-applications', require("./routes/jobapplication"));
 
+// employee apis
+app.use("/api/employees", require("./routes/employee"))
+app.use("/api", require("./routes/employee"))
+
+
 app.get("/", (req, res) => {
   res.send("Running cheap chip server!");
 });
