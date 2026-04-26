@@ -9,8 +9,10 @@ const {
 	getAssignedDeliveryRouteMapImage,
 	getDeliverymenPerformanceOverview,
 	getDeliverymanStatsByQuery,
+	getDeliverymanByID,
 } = require("../controllers/deliverymanController");
 
+router.get("/:deliverymanObjectID", getDeliverymanByID);
 router.get("/available", getAvailableDeliverymen);
 router.get("/assigned", getAssignedDeliveries);
 router.get("/route-map", getAssignedDeliveryRouteMap);

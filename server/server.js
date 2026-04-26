@@ -6,7 +6,7 @@ const cors = require("cors");
 const connectDB = require("./utils/db");
 const rateLimit = require("express-rate-limit");
 
-const port = process.env.SERVER_PORT || 5000;
+const port = process.env.SERVER_PORT || 5001;
 const app = express();
 
 const cooldownMinutes = Number.parseInt(process.env.COOLDOWN_MIN, 10);
@@ -18,7 +18,6 @@ const maxHits = Number.isFinite(hitLimitCount) && hitLimitCount > 0 ? hitLimitCo
 
 app.set('trust proxy', 1);
 
-// MongoDB connection
 connectDB();
 
 // CORS configuration (must run before body parsing so errors still include CORS headers)
@@ -52,6 +51,8 @@ const spamController = rateLimit({
   legacyHeaders: false,
 });
 
+app.use("/api/statistics", require("./routes/platformOverview"))
+
 // routes
 app.use("/api/authentication", spamController, require("./routes/authentication"));
 
@@ -70,6 +71,11 @@ app.use("/api/products-info", require("./routes/allProducts"));
 
 // Job application apis
 app.use('/api/job-applications', require("./routes/jobapplication"));
+
+// employee apis
+app.use("/api/employees", require("./routes/employee"))
+app.use("/api", require("./routes/employee"))
+
 
 app.get("/", (req, res) => {
   res.send("Running cheap chip server!");

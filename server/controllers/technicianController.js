@@ -71,10 +71,15 @@ const getAssignedProducts = async (req, res) => {
   try {
     const { db } = await connectDB();
     const normalizedEmail = normalizeEmail(req.query.email);
-    const view = typeof req.query.view === "string" ? req.query.view.trim().toLowerCase() : "assigned";
+    const view =
+      typeof req.query.view === "string"
+        ? req.query.view.trim().toLowerCase()
+        : "assigned";
 
     if (!normalizedEmail) {
-      return res.status(400).json({ message: "email query parameter is required" });
+      return res
+        .status(400)
+        .json({ message: "email query parameter is required" });
     }
 
     const technician = await getApprovedTechnicianByEmail(db, normalizedEmail);
@@ -158,7 +163,9 @@ const getAvailableTechnicians = async (req, res) => {
       return res.status(200).json([]);
     }
 
-    const technicianIds = approvedTechnicians.map((technician) => technician._id);
+    const technicianIds = approvedTechnicians.map(
+      (technician) => technician._id,
+    );
 
     const assignmentCounts = await db
       .collection(PRODUCTS_COLLECTION)
@@ -215,7 +222,9 @@ const assignTechnicianToProduct = async (req, res) => {
   }
 
   if (!ObjectId.isValid(productId) || !ObjectId.isValid(technicianId)) {
-    return res.status(400).json({ message: "Invalid productId or technicianId" });
+    return res
+      .status(400)
+      .json({ message: "Invalid productId or technicianId" });
   }
 
   let session = null;
@@ -323,7 +332,9 @@ const assignTechnicianToProduct = async (req, res) => {
       }
     });
 
-    return res.status(200).json({ message: "Technician assigned successfully" });
+    return res
+      .status(200)
+      .json({ message: "Technician assigned successfully" });
   } catch (error) {
     console.error("Assign technician error:", error);
     return res
@@ -455,9 +466,18 @@ const updateTechnicianStatus = async (req, res) => {
   }
 };
 
+// const getTechnicianByID = async (req, res) => {
+//   try {
+//     return res
+//       .status(200)
+//       .json({ message: "Technician route" });
+//   } catch (error) {}
+// };
+
 module.exports = {
   getAvailableTechnicians,
   assignTechnicianToProduct,
   getAssignedProducts,
   updateTechnicianStatus,
+  // getTechnicianByID,
 };
