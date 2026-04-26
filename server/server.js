@@ -18,8 +18,7 @@ const maxHits = Number.isFinite(hitLimitCount) && hitLimitCount > 0 ? hitLimitCo
 
 app.set('trust proxy', 1);
 
-// MongoDB connection (lazy - only connect on first request that needs it)
-// connectDB() will be called by controllers when needed
+connectDB();
 
 // CORS configuration (must run before body parsing so errors still include CORS headers)
 const corsOptions = {

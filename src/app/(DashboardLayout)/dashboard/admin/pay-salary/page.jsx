@@ -53,18 +53,14 @@ function page() {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Badge>
-                    Total: {employee.totalCompletedDeliveries}
-                  </Badge>
-                  <Badge variant="secondary">
-                    {employee.isActive ? "Active" : "Inactive"}
-                  </Badge>
+                <div className="flex justify-end gap-2">
+
+                  <Button className=" mt-2 py-2" onClick={() => setEmployeeToPay(employee)}>
+                    Pay Now
+                  </Button>
                 </div>
 
-                <Button className="w-full mt-2py-2 rounded-xl" onClick={() => setEmployeeToPay(employee)}>
-                  Pay Now
-                </Button>
+
               </CardContent>
             </Card>
           ))}

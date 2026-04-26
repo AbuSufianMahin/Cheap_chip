@@ -3,18 +3,6 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 let client;
 let db;
 
-const resolveDbName = (uri) => {
-  if (process.env.DB_NAME) return process.env.DB_NAME;
-
-  try {
-    const parsed = new URL(uri);
-    const pathname = parsed.pathname?.replace(/^\//, "");
-    return pathname || "cheap_chip";
-  } catch {
-    return "cheap_chip";
-  }
-};
-
 async function connectDB() {
   if (db) {
     return { db, client };
@@ -23,19 +11,15 @@ async function connectDB() {
   if (!client) {
     const uri = process.env.MONGODB_URI;
     if (!uri) {
-      const errorMsg = "MONGODB_URI is not set. Please set MONGODB_URI in .env file. Example: mongodb://127.0.0.1:27017/cheap_chip";
-      console.error("✗ " + errorMsg);
-      throw new Error(errorMsg);
+      throw new Error("MONGODB_URI is not set");
     }
-    const isSrv = uri.startsWith("mongodb+srv://");
-
     client = new MongoClient(uri, {
       serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
       },
-      tls: isSrv,
+      tls: true,
       tlsAllowInvalidCertificates: false,
     });
 
@@ -48,7 +32,7 @@ async function connectDB() {
     }
   }
 
-  db = client.db(resolveDbName(process.env.MONGODB_URI));
+  db = client.db(process.env.DB_NAME);
   return { db, client };
 }
 
