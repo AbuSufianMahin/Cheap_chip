@@ -19,7 +19,6 @@ async function findUserByEmail(db, email) {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  secret: process.env.NEXTAUTH_SECRET || "development-secret-key-change-in-production",
   session: {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 30, // 30 days
