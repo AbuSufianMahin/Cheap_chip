@@ -12,7 +12,6 @@ const {
 	getDeliverymanByID,
 } = require("../controllers/deliverymanController");
 
-router.get("/:deliverymanObjectID", getDeliverymanByID);
 router.get("/available", getAvailableDeliverymen);
 router.get("/assigned", getAssignedDeliveries);
 router.get("/route-map", getAssignedDeliveryRouteMap);
@@ -21,5 +20,6 @@ router.patch("/assign-product", assignDeliverymanToProduct);
 router.patch("/status", updateDeliveryStatus);
 router.get("/statistics", getDeliverymenPerformanceOverview);
 router.get("/statistics/:query", getDeliverymanStatsByQuery);
+router.get("/:deliverymanObjectID", getDeliverymanByID);
 
 module.exports = router;
