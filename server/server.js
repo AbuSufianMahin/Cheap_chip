@@ -52,6 +52,8 @@ const spamController = rateLimit({
   legacyHeaders: false,
 });
 
+app.use("/api/statistics", require("./routes/platformOverview"))
+
 // routes
 app.use("/api/authentication", spamController, require("./routes/authentication"));
 
@@ -59,6 +61,7 @@ app.use("/api/authentication", spamController, require("./routes/authentication"
 app.use("/api/riders-overview", require("./routes/ridersOverview"));
 
 app.use("/api/deliverymen", require("./routes/deliveryman"))
+app.use("/api/technicians", require("./routes/technician"));
 
 
 // product apis
@@ -69,6 +72,11 @@ app.use("/api/products-info", require("./routes/allProducts"));
 
 // Job application apis
 app.use('/api/job-applications', require("./routes/jobapplication"));
+
+// employee apis
+app.use("/api/employees", require("./routes/employee"))
+app.use("/api", require("./routes/employee"))
+
 
 app.get("/", (req, res) => {
   res.send("Running cheap chip server!");

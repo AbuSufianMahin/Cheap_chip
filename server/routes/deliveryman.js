@@ -5,11 +5,21 @@ const {
 	assignDeliverymanToProduct,
 	getAssignedDeliveries,
 	updateDeliveryStatus,
-} = require("../controllers/deliverymenController");
+	getAssignedDeliveryRouteMap,
+	getAssignedDeliveryRouteMapImage,
+	getDeliverymenPerformanceOverview,
+	getDeliverymanStatsByQuery,
+	getDeliverymanByID,
+} = require("../controllers/deliverymanController");
 
+router.get("/:deliverymanObjectID", getDeliverymanByID);
 router.get("/available", getAvailableDeliverymen);
 router.get("/assigned", getAssignedDeliveries);
+router.get("/route-map", getAssignedDeliveryRouteMap);
+router.get("/route-map/image", getAssignedDeliveryRouteMapImage);
 router.patch("/assign-product", assignDeliverymanToProduct);
 router.patch("/status", updateDeliveryStatus);
+router.get("/statistics", getDeliverymenPerformanceOverview);
+router.get("/statistics/:query", getDeliverymanStatsByQuery);
 
 module.exports = router;

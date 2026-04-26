@@ -17,7 +17,7 @@ const resolveDbName = (uri) => {
 
 async function connectDB() {
   if (db) {
-    return { db, client } ;
+    return { db, client };
   }
 
   if (!client) {

@@ -261,21 +261,71 @@ function UserOrders() {
       )}
 
       {/* Orders List */}
-      {activeTab === 'orders' && (
-        <>
-          {filteredOrders.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-12">
-                  <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders found</h3>
-                  <p className="text-gray-600 mb-4">
-                    {searchTerm ? 'Try adjusting your search terms' : 'You haven\'t placed any orders yet'}
-                  </p>
-                  {!searchTerm && (
-                    <Link href="/our-services">
-                      <Button className="bg-green-600 hover:bg-green-700">
-                        Browse Products
+      {filteredOrders.length === 0 ? (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center py-12">
+              <Package className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders found</h3>
+              <p className="text-gray-600 mb-4">
+                {searchTerm ? 'Try adjusting your search terms' : 'You haven\'t placed any orders yet'}
+              </p>
+              {!searchTerm && (
+                <Link href="/our-services">
+                  <Button className="bg-green-600 hover:bg-green-700">
+                    Browse Products
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-6">
+          {filteredOrders.map((order) => (
+            <Card key={order._id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg">Order #{order.orderId}</CardTitle>
+                  <Badge className={getStatusColor(order.status)}>
+                    <div className="flex items-center gap-1">
+                      {getStatusIcon(order.status)}
+                      {order.status}
+                    </div>
+                  </Badge>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Ordered on {new Date(order.createdAt).toLocaleDateString()}
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-4">
+                  {/* Product Image */}
+                  <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center shrink-0">
+                    {order.product?.productImage ? (
+                      <img
+                        src={order.product.productImage}
+                        alt={order.product.productName}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    ) : (
+                      <Package className="w-8 h-8 text-gray-400" />
+                    )}
+                  </div>
+
+                  {/* Product Details */}
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900">{order.product?.productName || 'Product'}</h3>
+                    <p className="text-sm text-gray-600">{order.product?.productCategory}</p>
+                    <p className="text-sm text-gray-600">Price: {order.product?.productPrice}</p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    <Link href={`/our-services/track-product?orderId=${order.orderId}`}>
+                      <Button variant="outline" size="sm">
+                        <Eye className="w-4 h-4 mr-1" />
+                        Track
                       </Button>
                     </Link>
                   )}

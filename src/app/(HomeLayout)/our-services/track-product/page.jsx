@@ -203,7 +203,7 @@ function TrackProduct() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-green-50 to-emerald-100 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-br from-white via-green-50 to-emerald-100 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -246,7 +246,7 @@ function TrackProduct() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg"
+                  className="flex-1 bg-linear-to-rrom-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg"
                 >
                   {loading ? 'Tracking...' : 'Track Order'}
                 </Button>
@@ -410,7 +410,7 @@ function TrackProduct() {
                 <div className="space-y-4">
                   {orderData.timeline?.map((step, index) => (
                     <div key={index} className="flex items-start gap-4">
-                      <div className="flex-shrink-0 mt-1">
+                      <div className="shrink-0 mt-1">
                         {getStatusIcon(step.status)}
                       </div>
                       <div className="flex-1">
@@ -434,7 +434,7 @@ function TrackProduct() {
             </Card>
 
             {/* Current Status with Live Indicator */}
-            <Card className="shadow-lg border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
+            <Card className="shadow-lg border-green-200 bg-linear-to-r from-green-50 to-emerald-50">
               <CardContent className="pt-6">
                 <div className="text-center">
                   <div className="inline-flex items-center gap-2 mb-4">

@@ -51,8 +51,8 @@ const navMain = [
         url: "/dashboard/technician/assigned",
       },
       {
-        title: "In Progress",
-        url: "/dashboard/technician/in-progress",
+        title: "All Products",
+        url: "/dashboard/technician/all-products",
       },
       {
         title: "Completed Jobs",
@@ -93,6 +93,10 @@ const navMain = [
     roles: ["admin"],
     items: [
       {
+        title: "Reports & Analytics",
+        url: "/dashboard/admin/reports-and-analytics",
+      },
+      {
         title: "Applications Review",
         url: "/dashboard/admin/applications",
       },
@@ -113,8 +117,8 @@ const navMain = [
         url: "/dashboard/admin/product-management",
       },
       {
-        title: "Reports & Analytics",
-        url: "/dashboard/admin/reports-and-analytics",
+        title: "Pay Salary",
+        url: "/dashboard/admin/pay-salary",
       },
     ],
   },
