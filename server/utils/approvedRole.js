@@ -17,6 +17,15 @@ async function getApprovedRoleForEmail(db, email) {
 
   const emailMatcher = buildEmailMatcher(email);
 
+  const approvedTechnicianInfo = await db.collection("technician-info").findOne({
+    email: emailMatcher,
+    isActive: true,
+  });
+
+  if (approvedTechnicianInfo) {
+    return "technician";
+  }
+
   const approvedTechnician = await db.collection("technicianApplications").findOne({
     email: emailMatcher,
     status: "approved",
@@ -24,6 +33,15 @@ async function getApprovedRoleForEmail(db, email) {
 
   if (approvedTechnician) {
     return "technician";
+  }
+
+  const approvedDeliveryInfo = await db.collection("deliveryman-info").findOne({
+    email: emailMatcher,
+    isActive: true,
+  });
+
+  if (approvedDeliveryInfo) {
+    return "deliveryman";
   }
 
   const approvedDelivery = await db.collection("deliverymanApplications").findOne({
