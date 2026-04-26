@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DollarSign, Users, TrendingUp, Shield, Star, CheckCircle, Search, ShoppingCart, Store } from 'lucide-react';
+import { DollarSign, Users, TrendingUp, Shield, Star, CheckCircle, Search, ShoppingCart, Store, Wrench } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -58,10 +58,10 @@ function OurServices() {
 
           {/* User Type Selection */}
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 auto-rows-fr">
               {/* Buyer Card */}
-              <div className="group cursor-pointer" onClick={() => setUserType('buyer')}>
-                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-green-200 p-8 md:p-12 hover:border-green-400 hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105">
+              <div className="group cursor-pointer h-full" onClick={() => setUserType('buyer')}>
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-green-200 p-8 md:p-12 hover:border-green-400 hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105 h-full">
                   <div className="text-center">
                     <div className="w-20 h-20 bg-linear-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                       <ShoppingCart className="w-10 h-10 text-white" />
@@ -101,8 +101,8 @@ function OurServices() {
               </div>
 
               {/* Seller Card */}
-              <div className="group cursor-pointer" onClick={handleSellerClick}>
-                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-green-200 p-8 md:p-12 hover:border-green-400 hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105">
+              <div className="group cursor-pointer h-full" onClick={handleSellerClick}>
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-green-200 p-8 md:p-12 hover:border-green-400 hover:shadow-green-500/25 transition-all duration-300 transform hover:scale-105 h-full">
                   <div className="text-center">
                     <div className="w-20 h-20 bg-linear-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
                       <Store className="w-10 h-10 text-white" />
@@ -137,6 +137,43 @@ function OurServices() {
                     </Button>
                   </div>
                 </div>
+              </div>
+
+              {/* Repair Card */}
+              <div className="group cursor-pointer h-full">
+                <Link href="/our-services/repair-product" className="block h-full">
+                  <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-orange-200 p-8 md:p-12 hover:border-orange-400 hover:shadow-orange-500/25 transition-all duration-300 transform hover:scale-105 h-full">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-linear-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <Wrench className="w-10 h-10 text-white" />
+                      </div>
+
+                      <h3 className="text-3xl font-bold text-gray-800 mb-4">Repair Product</h3>
+                      <p className="text-gray-600 mb-6 text-lg">
+                        Need to repair a device? Enter diagnosis and get automated repair time estimation with our smart system.
+                      </p>
+
+                      <div className="space-y-3 mb-8">
+                        <div className="flex items-center gap-3 text-orange-700">
+                          <CheckCircle className="w-5 h-5" />
+                          <span>Smart repair time estimation</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-orange-700">
+                          <CheckCircle className="w-5 h-5" />
+                          <span>Expert diagnosis support</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-orange-700">
+                          <CheckCircle className="w-5 h-5" />
+                          <span>Track or recycle options</span>
+                        </div>
+                      </div>
+
+                      <Button className="w-full py-4 text-lg bg-linear-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-orange-500/25">
+                        Start Repair 🔧
+                      </Button>
+                    </div>
+                  </div>
+                </Link>
               </div>
             </div>
 

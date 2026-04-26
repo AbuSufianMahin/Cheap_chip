@@ -1,6 +1,6 @@
 import { auth } from "../../../../../auth.js";
 
-const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5001";
 
 function isAdmin(session) {
   return session?.user?.role === "admin";

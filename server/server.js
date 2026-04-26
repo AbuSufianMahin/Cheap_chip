@@ -6,7 +6,7 @@ const cors = require("cors");
 const connectDB = require("./utils/db");
 const rateLimit = require("express-rate-limit");
 
-const port = process.env.SERVER_PORT || 5000;
+const port = process.env.SERVER_PORT || 5001;
 const app = express();
 
 const cooldownMinutes = Number.parseInt(process.env.COOLDOWN_MIN, 10);
@@ -18,8 +18,8 @@ const maxHits = Number.isFinite(hitLimitCount) && hitLimitCount > 0 ? hitLimitCo
 
 app.set('trust proxy', 1);
 
-// MongoDB connection
-connectDB();
+// MongoDB connection (lazy - only connect on first request that needs it)
+// connectDB() will be called by controllers when needed
 
 // CORS configuration (must run before body parsing so errors still include CORS headers)
 const corsOptions = {
