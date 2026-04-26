@@ -146,12 +146,27 @@ const getAvailableTechnicians = async (req, res) => {
     if (!approvedTechnicians.length) {
       approvedTechnicians = await db
         .collection(USERS_COLLECTION)
-        .find({ role: "technician" })
+        .find({ role: { $regex: /^technician$/i } })
         .project({
           _id: 1,
           name: 1,
           email: 1,
           image: 1,
+          mobileNumber: 1,
+          skills: 1,
+          location: 1,
+        })
+        .toArray();
+    }
+
+    if (!approvedTechnicians.length) {
+      approvedTechnicians = await db
+        .collection(TECHNICIAN_APPLICATIONS_COLLECTION)
+        .find({ status: "approved" })
+        .project({
+          _id: 1,
+          name: 1,
+          email: 1,
           mobileNumber: 1,
           skills: 1,
           location: 1,
@@ -251,7 +266,7 @@ const assignTechnicianToProduct = async (req, res) => {
       const technicianFromUsers = await db.collection(USERS_COLLECTION).findOne(
         {
           _id: technicianObjId,
-          role: "technician",
+          role: { $regex: /^technician$/i },
         },
         { session },
       );
