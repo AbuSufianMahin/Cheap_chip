@@ -199,7 +199,7 @@ export default function RepairProduct() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-orange-50 to-amber-100 py-12 px-4">
+    <div className="min-h-screen bg-linear-to-br from-white via-orange-50 to-amber-100 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -207,7 +207,7 @@ export default function RepairProduct() {
             <Wrench className="w-4 h-4" />
             CPU Repair Estimation
           </div>
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 bg-linear-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
             CPU Repair Quote
           </h1>
           <p className="text-xl text-gray-600 max-w-xl mx-auto">
@@ -375,7 +375,7 @@ export default function RepairProduct() {
 
               {error && (
                 <div className="flex gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
                   <p className="text-red-800">{error}</p>
                 </div>
               )}
@@ -499,7 +499,7 @@ export default function RepairProduct() {
 
         {/* Confirmation with Tracking ID */}
         {step === 'confirmation' && trackingId && (
-          <Card className="mb-8 shadow-lg border-green-300 bg-gradient-to-br from-green-50 to-emerald-50">
+          <Card className="mb-8 shadow-lg border-green-300 bg-linear-to-br from-green-50 to-emerald-50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-green-700 text-center justify-center">
                 <CheckCircle className="w-6 h-6" />

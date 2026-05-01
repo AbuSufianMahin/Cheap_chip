@@ -40,7 +40,7 @@ export default function OrderChatbot() {
       const groq = new Groq({ apiKey, dangerouslyAllowBrowser: true });
 
       const context = `
-You are a helpful support chatbot for Cheap Chip, a computer parts marketplace.
+You are a helpful support chatbot for Cheap Chip, a recycling marketplace.
 Help users with questions about order tracking, repairs, shipping, returns, refunds, and support.
 Keep responses concise (1-3 sentences), friendly, and use emoji when appropriate.
 Support both English and Bengali.
@@ -149,9 +149,9 @@ Support both English and Bengali.
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 z-50 w-96 max-h-[600px] flex flex-col shadow-2xl border-green-200">
+        <Card className="fixed bottom-6 right-6 z-50 w-96 max-h-150 flex flex-col shadow-2xl border-green-200">
           {/* Header */}
-          <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white p-4 flex justify-between items-center rounded-t-lg">
+          <div className="bg-linear-to-r from-green-600 to-emerald-600 text-white p-4 flex justify-between items-center rounded-t-lg">
             <div>
               <h3 className="font-semibold">Order Tracking Assistant</h3>
               <p className="text-xs opacity-90">Always here to help</p>

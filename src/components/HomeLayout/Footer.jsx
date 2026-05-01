@@ -12,8 +12,8 @@ import { Input } from "../ui/input";
 
 function Footer() {
   const services = [
-    { name: "Sell Device", path: "/our-services/sell-device" },
-    { name: "Track product", path: "/our-services/track-product" },
+    { name: "Sell Device", path: "/dashboard/user/create-sell-post" },
+    { name: "Track product", path: "/dashboard/user/track-product" },
     { name: "Buy Refurbished", path: "/our-services/buy" },
     { name: "Recycling", path: "/our-services/recycling" },
     { name: "Device Collection", path: "/our-services/sell-device" },
