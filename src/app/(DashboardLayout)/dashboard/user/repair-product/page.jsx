@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Wrench, AlertCircle, CheckCircle, DollarSign, Clock } from 'lucide-react';
+import axiosPublic from '@/lib/axiosPublic';
 
 const PRODUCT_TYPES = [
   'CPU Processor (Intel/AMD)',
@@ -49,7 +50,7 @@ const PROBLEM_OPTIONS = [
 
 export default function RepairProduct() {
   const [step, setStep] = useState('details'); // 'details', 'problems', 'quote', 'confirmation'
-  
+
   // Form data
   const [productType, setProductType] = useState('');
   const [productModel, setProductModel] = useState('');
@@ -58,7 +59,7 @@ export default function RepairProduct() {
   const [releaseYear, setReleaseYear] = useState('');
   const [selectedProblems, setSelectedProblems] = useState([]);
   const [description, setDescription] = useState('');
-  
+
   const [quote, setQuote] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -106,7 +107,7 @@ export default function RepairProduct() {
       const releaseYr = parseInt(releaseYear);
       const currentYear = new Date().getFullYear();
       const ageYears = currentYear - releaseYr;
-      
+
       if (ageYears > 8) {
         ageMultiplier = 1.5;
       } else if (ageYears > 5) {
@@ -154,6 +155,7 @@ export default function RepairProduct() {
   };
 
   const handleRequestRepair = async () => {
+    console.log("REQUEST REPAIR INVOKED")
     setLoading(true);
     setError('');
 
@@ -175,16 +177,11 @@ export default function RepairProduct() {
 
       console.log('Submitting repair data:', repairData);
 
-      const response = await fetch('/api/repair-requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(repairData),
-      });
-
-      const data = await response.json();
+      const response = await axiosPublic.post('/api/repair-requests', repairData);
+      const data = response.data;
       console.log('API Response:', data);
 
-      if (!response.ok) {
+      if (!data.success) {
         throw new Error(data.message || 'Failed to submit repair request');
       }
 
@@ -261,11 +258,10 @@ export default function RepairProduct() {
                     <button
                       key={cond.value}
                       onClick={() => setCondition(cond.value)}
-                      className={`p-3 border-2 rounded-lg transition ${
-                        condition === cond.value
-                          ? 'border-orange-500 bg-orange-50'
-                          : 'border-gray-200 hover:border-orange-300'
-                      }`}
+                      className={`p-3 border-2 rounded-lg transition ${condition === cond.value
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-orange-300'
+                        }`}
                     >
                       <p className="font-semibold text-sm">{cond.label}</p>
                       <p className="text-xs text-gray-500">+{cond.damagePercent}% cost</p>
@@ -333,11 +329,10 @@ export default function RepairProduct() {
                   <button
                     key={problem.id}
                     onClick={() => toggleProblem(problem.id)}
-                    className={`p-4 border-2 rounded-lg text-left transition ${
-                      selectedProblems.includes(problem.id)
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-300'
-                    }`}
+                    className={`p-4 border-2 rounded-lg text-left transition ${selectedProblems.includes(problem.id)
+                      ? 'border-orange-500 bg-orange-50'
+                      : 'border-gray-200 hover:border-orange-300'
+                      }`}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -347,11 +342,10 @@ export default function RepairProduct() {
                         </p>
                       </div>
                       <div
-                        className={`w-6 h-6 rounded border-2 flex items-center justify-center ${
-                          selectedProblems.includes(problem.id)
-                            ? 'border-orange-500 bg-orange-500'
-                            : 'border-gray-300'
-                        }`}
+                        className={`w-6 h-6 rounded border-2 flex items-center justify-center ${selectedProblems.includes(problem.id)
+                          ? 'border-orange-500 bg-orange-500'
+                          : 'border-gray-300'
+                          }`}
                       >
                         {selectedProblems.includes(problem.id) && (
                           <CheckCircle className="w-5 h-5 text-white" />
@@ -485,7 +479,7 @@ export default function RepairProduct() {
                 >
                   Get Another Quote
                 </Button>
-                <Button 
+                <Button
                   onClick={handleRequestRepair}
                   disabled={loading}
                   className="flex-1 bg-green-600 hover:bg-green-700 text-white py-6"

@@ -58,7 +58,7 @@ function OurServices() {
       featureColor: 'text-orange-700',
       buttonClass: 'from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 hover:shadow-orange-500/25',
       buttonLabel: 'Start Repair 🔧',
-      buttonLink: '/dashboard/user/track-product',
+      buttonLink: '/dashboard/user/repair-product',
     },
   ]
 
