@@ -3,7 +3,7 @@ import React from 'react'
 
 function ProductLoadingSkeleton() {
     return (
-        <div className="border rounded-xl px-6 py-4 flex gap-4 items-center">
+        <div className="bg-white border rounded-xl px-6 py-4 flex gap-4 items-center">
             <Skeleton className="w-30 h-30 rounded-md shrink-0" />
             <div className="flex-1 flex gap-2 flex-col xl:flex-row items-center justify-between w-full">
                 <div className="w-full space-y-4">

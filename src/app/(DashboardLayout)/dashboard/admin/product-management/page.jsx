@@ -92,7 +92,7 @@ function page() {
               productData.map((product, index) => (
                 <div
                   key={product._id}
-                  className="rounded-lg shadow-sm p-6 sm:px-6 sm:py-2 flex flex-col sm:flex-row gap-4 sm:items-center"
+                  className="bg-white rounded-lg shadow-sm p-6 sm:px-6 sm:py-4 flex flex-col sm:flex-row gap-4 sm:items-center"
                 >
                   <div className="relative w-full sm:w-32 h-32">
                     <Image
