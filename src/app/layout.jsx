@@ -2,6 +2,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import OrderChatbot from "@/components/shared/OrderChatbot";
 
 const dm_sans = DM_Sans({ subsets: ['latin'], weight: ['400'] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       >
         <Toaster position="top-center" richColors/>
         <TooltipProvider>{children}</TooltipProvider>
+        <OrderChatbot/>
       </body>
     </html>
   );

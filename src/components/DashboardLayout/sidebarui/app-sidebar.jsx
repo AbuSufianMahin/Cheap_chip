@@ -26,17 +26,22 @@ const navMain = [
     roles: ["user", "technician", "deliveryman", "admin"],
     items: [
       {
-        title: "My Peripherals",
-        url: "/dashboard/user/peripherals",
+        title: "Create Sell Post",
+        url: "/dashboard/user/create-sell-post",
       },
       {
-        title: "Track Products",
-        url: "/dashboard/user/orders",
+        title: "Repair Product",
+        url: "/dashboard/user/repair-product",
       },
       {
-        title: "Payment History",
-        url: "/dashboard/user/payments",
+        title: "My Orders",
+        url: "/dashboard/user/my-orders",
       },
+      {
+        title: "Track Product",
+        url: "/dashboard/user/track-product",
+      },
+
     ],
   },
 
@@ -101,45 +106,12 @@ const navMain = [
         url: "/dashboard/admin/applications",
       },
       {
-        title: "User management",
-        url: "/dashboard/admin/user-management",
-      },
-      {
-        title: "Manage Deliveryman",
-        url: "/dashboard/admin/manage-deliveryman",
-      },
-      {
-        title: "Manage Technicians",
-        url: "/dashboard/admin/manage-technicians",
-      },
-      {
         title: "Product Management",
         url: "/dashboard/admin/product-management",
       },
       {
         title: "Pay Salary",
         url: "/dashboard/admin/pay-salary",
-      },
-    ],
-  },
-
-  // ================= COMMON =================
-  {
-    title: "Support",
-    icon: LifeBuoy,
-    roles: ["user", "technician", "delivery", "admin"],
-    items: [
-      {
-        title: "Help Center",
-        url: "/help",
-      },
-      {
-        title: "Contact Support",
-        url: "/contact",
-      },
-      {
-        title: "FAQs",
-        url: "/faq",
       },
     ],
   },

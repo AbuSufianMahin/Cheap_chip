@@ -3,6 +3,11 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+
+/* *, *::before, *::after {
+  outline: 1px solid red;
+} */
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {

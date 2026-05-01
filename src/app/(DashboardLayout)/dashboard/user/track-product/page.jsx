@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Clock, Truck, Package, AlertCircle, Search, RefreshCw } from 'lucide-react';
 import OrderChatbot from '@/components/shared/OrderChatbot';
+import { toast } from 'sonner';
 
 function TrackProduct() {
   const searchParams = useSearchParams();
@@ -91,15 +92,15 @@ function TrackProduct() {
       // Fall back to product order tracking
       const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
       console.log('[TrackOrder] Fetching from:', `${apiUrl}/api/orders/track/${cleanId}`);
-      
+
       const response = await fetch(`${apiUrl}/api/orders/track/${cleanId}`);
       console.log('[TrackOrder] Response status:', response.status);
-      
+
       const data = await response.json();
       console.log('[TrackOrder] Response data:', data);
 
       if (!response.ok) {
-        throw new Error(data.message || 'Order/Repair not found');
+        toast.error(data.message || 'Order/Repair not found');
       }
 
       setOrderData({
@@ -148,7 +149,7 @@ function TrackProduct() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'No matching product found');
+        toast.error(data.message || 'No matching product found');
       }
 
       setSupportResults(data.results || []);
@@ -203,7 +204,7 @@ function TrackProduct() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-white via-green-50 to-emerald-100 py-12 px-4">
+    <div className="min-h-screen px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -211,7 +212,7 @@ function TrackProduct() {
             <Package className="w-4 h-4" />
             Track Your Order
           </div>
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
             Track Your Order or Repair
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -246,7 +247,7 @@ function TrackProduct() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-linear-to-rrom-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg"
+                  className="flex-1 py-3 text-lg"
                 >
                   {loading ? 'Tracking...' : 'Track Order'}
                 </Button>
@@ -342,7 +343,7 @@ function TrackProduct() {
                   {orderData.statusHistory && orderData.statusHistory.length > 0 ? (
                     orderData.statusHistory.map((step, index) => (
                       <div key={index} className="flex items-start gap-4">
-                        <div className="flex-shrink-0 mt-1">
+                        <div className="shrink-0 mt-1">
                           <CheckCircle className="w-5 h-5 text-green-500" />
                         </div>
                         <div className="flex-1">
@@ -424,11 +425,11 @@ function TrackProduct() {
                       </div>
                     </div>
                   )) || (
-                    <div className="text-center py-8 text-gray-500">
-                      <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>No tracking information available yet</p>
-                    </div>
-                  )}
+                      <div className="text-center py-8 text-gray-500">
+                        <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>No tracking information available yet</p>
+                      </div>
+                    )}
                 </div>
               </CardContent>
             </Card>
@@ -452,10 +453,10 @@ function TrackProduct() {
                     {orderData.status === 'delivered'
                       ? '✓ Your order has been successfully delivered!'
                       : orderData.status === 'shipped'
-                      ? '🚚 Your order is on the way'
-                      : orderData.status === 'processing'
-                      ? '⚙️ Your order is being prepared'
-                      : '📦 Your order is being processed. We\'ll keep you updated.'}
+                        ? '🚚 Your order is on the way'
+                        : orderData.status === 'processing'
+                          ? '⚙️ Your order is being prepared'
+                          : '📦 Your order is being processed. We\'ll keep you updated.'}
                   </p>
                 </div>
               </CardContent>
@@ -585,9 +586,6 @@ function TrackProduct() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Chatbot Component */}
-      <OrderChatbot />
     </div>
   );
 }
