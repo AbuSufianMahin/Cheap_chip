@@ -196,7 +196,7 @@ export default function RepairProduct() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-white via-orange-50 to-amber-100 py-12 px-4">
+    <div className="min-h-screen py-12 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">

@@ -4,7 +4,7 @@ import { Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, 
 
 function TopDeliverymenBarChart({ topDeliverymen }) {
     return (
-        <div className="rounded-xl p-5 w-full shadow lg:col-span-3 xl:col-span-4 2xl:col-span-3">
+        <div className="bg-white rounded-xl p-5 w-full shadow lg:col-span-3 xl:col-span-4 2xl:col-span-3">
             <p className="font-semibold text-lg mb-0.5">Deliveries per deliverymen</p>
             <p className="text-xs mb-4">Top 5 deliverymen</p>
             <div className="w-full aspect-square max-h-60">
