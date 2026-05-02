@@ -155,7 +155,6 @@ export default function RepairProduct() {
   };
 
   const handleRequestRepair = async () => {
-    console.log("REQUEST REPAIR INVOKED")
     setLoading(true);
     setError('');
 
@@ -175,11 +174,9 @@ export default function RepairProduct() {
         additionalDetails: description,
       };
 
-      console.log('Submitting repair data:', repairData);
-
       const response = await axiosPublic.post('/api/repair-requests', repairData);
       const data = response.data;
-      console.log('API Response:', data);
+  
 
       if (!data.success) {
         throw new Error(data.message || 'Failed to submit repair request');

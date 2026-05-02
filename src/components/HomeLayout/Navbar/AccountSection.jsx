@@ -4,7 +4,6 @@ import VisitorState from "./VisitorState";
 
 async function AccountSection() {
   const session = await auth();
-  console.log(session)
   return (
     <>
       {session?.user ? (
