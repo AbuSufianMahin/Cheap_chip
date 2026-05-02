@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Package, Truck, CheckCircle, Clock, Search, Eye, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import axiosPublic from '@/lib/axiosPublic';
 
 function UserOrders() {
   const [orders, setOrders] = useState([]);
@@ -49,16 +50,10 @@ function UserOrders() {
       // For now, we'll use a mock user ID. In a real app, this would come from authentication
       const userId = 'test-user-123'; // Replace with actual user ID from auth context
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/orders/user/${userId}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        setOrders(data);
-      } else {
-        setError(data.message || 'Failed to fetch orders');
-      }
+      const response = await axiosPublic.get(`/api/orders/user/${userId}`);
+      setOrders(response.data);
     } catch (err) {
-      setError('Failed to fetch orders');
+      setError(err.response?.data?.message || 'Failed to fetch orders');
     } finally {
       setLoading(false);
     }

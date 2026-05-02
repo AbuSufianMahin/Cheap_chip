@@ -8,6 +8,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, MapPin, Phone, Calendar, AlertCircle, Share2, Heart } from 'lucide-react';
 import Link from 'next/link';
+import axiosPublic from '@/lib/axiosPublic';
 
 function ProductDetails() {
 	const params = useParams();
@@ -26,18 +27,11 @@ function ProductDetails() {
 		try {
 			setLoading(true);
 			setError('');
-			const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
 
-			const response = await fetch(`${apiUrl}/api/product-lifecycle/${productId}`);
-
-			if (!response.ok) {
-				throw new Error(`HTTP ${response.status} - Product not found`);
-			}
-
-			const data = await response.json();
-			setProduct(data);
+			const response = await axiosPublic.get(`/api/product-lifecycle/${productId}`);
+			setProduct(response.data);
 		} catch (err) {
-			setError(err.message || 'Failed to fetch product details');
+			setError(err.response?.data?.message || err.message || 'Failed to fetch product details');
 		} finally {
 			setLoading(false);
 		}

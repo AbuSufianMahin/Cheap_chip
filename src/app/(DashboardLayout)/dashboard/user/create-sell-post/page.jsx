@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import axiosPublic from '@/lib/axiosPublic';
 
 function OurServices() {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
@@ -77,7 +78,6 @@ function OurServices() {
     }
 
     try {
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
       const now = new Date().toISOString();
       const trackingId = data.trackingId?.trim() || `ORD-${Date.now()}`;
 
@@ -112,19 +112,8 @@ function OurServices() {
         },
       };
 
-      const response = await fetch(`${apiBaseUrl}/api/product-lifecycle/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to create sell post');
-      }
+      const response = await axiosPublic.post('/api/product-lifecycle/create', payload);
+      const result = response.data;
 
       setSuccessMessage(`Sell post created successfully! Tracking ID: ${trackingId}`);
       reset();
