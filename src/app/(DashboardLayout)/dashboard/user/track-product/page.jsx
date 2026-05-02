@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Clock, Truck, Package, AlertCircle, Search, RefreshCw } from 'lucide-react';
 import OrderChatbot from '@/components/shared/OrderChatbot';
 import { toast } from 'sonner';
+import axiosPublic from '@/lib/axiosPublic';
 
 function TrackProduct() {
   const searchParams = useSearchParams();
@@ -75,33 +76,30 @@ function TrackProduct() {
       if (isRepairId) {
         // Try repair tracking first
         console.log('[TrackRepair] Fetching repair with tracking ID:', cleanId);
-        const repairResponse = await fetch(`/api/repair-requests?trackingId=${cleanId}`);
-        const repairData = await repairResponse.json();
-        console.log('[TrackRepair] Response:', repairData);
+        try {
+          const repairResponse = await axiosPublic.get(`/api/repair-requests?trackingId=${cleanId}`);
+          const repairData = repairResponse.data;
+          console.log('[TrackRepair] Response:', repairData);
 
-        if (repairResponse.ok && repairData.data) {
-          setOrderData({
-            type: 'repair',
-            ...repairData.data,
-          });
-          setLastUpdated(new Date());
-          return;
+          if (repairData.data) {
+            setOrderData({
+              type: 'repair',
+              ...repairData.data,
+            });
+            setLastUpdated(new Date());
+            return;
+          }
+        } catch (repairError) {
+          console.log('[TrackRepair] Repair not found, falling back to order tracking');
         }
       }
 
       // Fall back to product order tracking
-      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
-      console.log('[TrackOrder] Fetching from:', `${apiUrl}/api/orders/track/${cleanId}`);
+      console.log('[TrackOrder] Fetching order:', cleanId);
 
-      const response = await fetch(`${apiUrl}/api/orders/track/${cleanId}`);
-      console.log('[TrackOrder] Response status:', response.status);
-
-      const data = await response.json();
+      const response = await axiosPublic.get(`/api/orders/track/${cleanId}`);
+      const data = response.data;
       console.log('[TrackOrder] Response data:', data);
-
-      if (!response.ok) {
-        toast.error(data.message || 'Order/Repair not found');
-      }
 
       setOrderData({
         type: 'order',
@@ -134,7 +132,6 @@ function TrackProduct() {
     setSupportResults([]);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
       const params = new URLSearchParams();
 
       if (supportForm.productId.trim()) {
@@ -145,12 +142,8 @@ function TrackProduct() {
         params.set('productCondition', supportForm.productCondition.trim());
       }
 
-      const response = await fetch(`${apiUrl}/api/orders/support/search?${params.toString()}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.message || 'No matching product found');
-      }
+      const response = await axiosPublic.get(`/api/orders/support/search?${params.toString()}`);
+      const data = response.data;
 
       setSupportResults(data.results || []);
       if (!data.results?.length) {

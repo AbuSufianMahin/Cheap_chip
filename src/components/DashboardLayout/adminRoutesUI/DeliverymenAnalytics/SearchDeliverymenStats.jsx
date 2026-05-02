@@ -44,7 +44,7 @@ function SearchDeliverymenStats() {
                     <Input
                         type={"text"}
                         placeholder="Search deliveryman by name or email"
-                        className="w-full md:w-2/3 xl:w-1/3 text-xs md:text-sm lg:text-base"
+                        className="bg-white w-full md:w-2/3 xl:w-1/3 text-xs md:text-sm lg:text-base"
                         {...register("queryParameter", {
                             minLength: {
                                 value: 3,
@@ -69,7 +69,7 @@ function SearchDeliverymenStats() {
                     searchQuery.length < 3 ?
                         null :
                         deliverymenData.length == 0 ?
-                            <div className='border rounded-xl p-8 flex flex-col items-center justify-center gap-2 text-center'>
+                            <div className='bg-white border rounded-xl p-8 flex flex-col items-center justify-center gap-2 text-center'>
                                 <div className='w-10 h-10 rounded-full bg-muted flex items-center justify-center'>
                                     <SearchX className='w-5 h-5 text-muted-foreground' />
                                 </div>
@@ -77,7 +77,7 @@ function SearchDeliverymenStats() {
                                 <p className='text-xs text-muted-foreground'>No results for <span className='font-medium text-foreground'>"{searchQuery}"</span>. Try a different name or email.</p>
                             </div>
                             :
-                            <div className={`rounded-xl divide-y ${deliverymenData.length > 0 && "border"}`}>
+                            <div className={`bg-white rounded-xl divide-y ${deliverymenData.length > 0 && "border"}`}>
                                 {
                                     deliverymenData.map((deliveryman) => (
                                         <div key={deliveryman._id} className='flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-4 hover:bg-muted/50 transition-colors'>

@@ -17,7 +17,7 @@ function VisitorState() {
           </Link>
           <span>or</span>
           <Link
-            href={"/register"}
+            href={"/login"}
             className="hover:text-green-600 hover:underline"
           >
             Register
