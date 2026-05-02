@@ -10,6 +10,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Search, Filter, ArrowLeft, MapPin, Phone, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { generatePriceRanges, formatPrice } from '@/lib/priceUtils';
+import axiosPublic from '@/lib/axiosPublic';
 
 function BuyProducts() {
   const [products, setProducts] = useState([]);
@@ -51,15 +52,9 @@ function BuyProducts() {
     try {
       setLoading(true);
       setError('');
-      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
 
-      const response = await fetch(`${apiUrl}/api/products-info`);
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
+      const response = await axiosPublic.get(`/api/products-info`);
+      const data = response.data;
 
       // Filter to only active products
       const activeProducts = Array.isArray(data)
@@ -69,7 +64,7 @@ function BuyProducts() {
       setProducts(activeProducts);
     } catch (err) {
       console.error('[BuyProducts] Error:', err);
-      setError(err.message || 'Failed to fetch products');
+      setError(err.response?.data?.message || err.message || 'Failed to fetch products');
       setProducts([]);
     } finally {
       setLoading(false);
