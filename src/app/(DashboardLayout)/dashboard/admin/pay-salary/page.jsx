@@ -8,13 +8,15 @@ import ConfirmPaymentDialogue from '@/components/DashboardLayout/adminRoutesUI/P
 import { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
+import SalaryCardSkeleton from '@/components/DashboardLayout/adminRoutesUI/PaySalary/SalaryCardSkeleton';
+import ClearedPaymentState from '@/components/DashboardLayout/adminRoutesUI/PaySalary/ClearedPaymentState';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 
 function page() {
   const [employeeToPay, setEmployeeToPay] = useState();
 
-  const { data: employeesData = [], isLoading, refetch: fetchEmployees } = useQuery({
+  const { data: employeesData = [], isLoading } = useQuery({
     queryKey: ["all-employees"],
     queryFn: async () => {
       const result = await axiosPublic.get("/api/employees/get-all-employee");
@@ -31,46 +33,50 @@ function page() {
       </div>
 
       {isLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="grid md:grid-cols-2 gap-x-2 gap-y-4">
-          {employeesData.employees.map((employee) => (
-            <Card key={employee._id} className="rounded-2xl shadow-sm">
-              <CardContent className="p-4 space-y-2">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="font-semibold">{employee.name}</h2>
-                    <p className="text-sm text-gray-500">{employee.email}</p>
+        <SalaryCardSkeleton />
+      ) :
+
+        employeesData.length === 0 ?
+          <ClearedPaymentState />
+          :
+          <div className="grid md:grid-cols-2 gap-x-2 gap-y-4">
+            {employeesData.employees.map((employee) => (
+              <Card key={employee._id} className="rounded-2xl shadow-sm">
+                <CardContent className="p-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h2 className="font-semibold">{employee.name}</h2>
+                      <p className="text-sm text-gray-500">{employee.email}</p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="font-bold">
+                        $ {employee.payableAmount}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {employee.thisMonthDeliveries} deliveries
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="text-right">
-                    <p className="font-bold">
-                      $ {employee.payableAmount}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {employee.thisMonthDeliveries} deliveries
-                    </p>
+                  <div className="flex justify-end gap-2">
+
+                    <Button className=" mt-2 py-2" onClick={() => setEmployeeToPay(employee)}>
+                      Pay Now
+                    </Button>
                   </div>
-                </div>
-
-                <div className="flex justify-end gap-2">
-
-                  <Button className=" mt-2 py-2" onClick={() => setEmployeeToPay(employee)}>
-                    Pay Now
-                  </Button>
-                </div>
 
 
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+      }
       <Elements stripe={stripePromise}>
         <ConfirmPaymentDialogue
           employee={employeeToPay}
           onClose={() => setEmployeeToPay(null)}
-          onSuccess={() => fetchEmployees()} // refetch your list after payment
         />
       </Elements>
     </section>
