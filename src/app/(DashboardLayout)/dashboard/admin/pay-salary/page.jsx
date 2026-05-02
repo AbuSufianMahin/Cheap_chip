@@ -16,7 +16,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY);
 function page() {
   const [employeeToPay, setEmployeeToPay] = useState();
 
-  const { data: employeesData = [], isLoading, refetch: fetchEmployees } = useQuery({
+  const { data: employeesData = [], isLoading } = useQuery({
     queryKey: ["all-employees"],
     queryFn: async () => {
       const result = await axiosPublic.get("/api/employees/get-all-employee");
@@ -77,7 +77,6 @@ function page() {
         <ConfirmPaymentDialogue
           employee={employeeToPay}
           onClose={() => setEmployeeToPay(null)}
-          onSuccess={() => fetchEmployees()} // refetch your list after payment
         />
       </Elements>
     </section>

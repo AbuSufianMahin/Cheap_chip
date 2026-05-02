@@ -61,7 +61,7 @@ function ConfirmPaymentDialogue({ employee, onClose }) {
                 });
 
                 toast.success(`Payment of $${employee.payableAmount} sent to ${employee.name}`);
-                queryClient.invalidateQueries({ queryKey: ["employees"] });
+                queryClient.invalidateQueries({ queryKey: ["all-employees"] });
                 onClose();
             }
         } catch (err) {
