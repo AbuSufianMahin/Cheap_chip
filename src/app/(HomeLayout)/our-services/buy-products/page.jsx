@@ -52,17 +52,14 @@ function BuyProducts() {
       setLoading(true);
       setError('');
       const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
-      console.log('[BuyProducts] Fetching from:', `${apiUrl}/api/products-info`);
 
       const response = await fetch(`${apiUrl}/api/products-info`);
-      console.log('[BuyProducts] Response status:', response.status);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('[BuyProducts] Fetched products:', data);
 
       // Filter to only active products
       const activeProducts = Array.isArray(data)

@@ -75,11 +75,11 @@ function TrackProduct() {
 
       if (isRepairId) {
         // Try repair tracking first
-        console.log('[TrackRepair] Fetching repair with tracking ID:', cleanId);
+        
         try {
           const repairResponse = await axiosPublic.get(`/api/repair-requests?trackingId=${cleanId}`);
           const repairData = repairResponse.data;
-          console.log('[TrackRepair] Response:', repairData);
+          
 
           if (repairData.data) {
             setOrderData({
@@ -99,7 +99,6 @@ function TrackProduct() {
 
       const response = await axiosPublic.get(`/api/orders/track/${cleanId}`);
       const data = response.data;
-      console.log('[TrackOrder] Response data:', data);
 
       setOrderData({
         type: 'order',

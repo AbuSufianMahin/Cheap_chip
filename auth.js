@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import getApprovedRoleForEmail from "./server/utils/approvedRole";
+import getApprovedRoleForEmail from "@/lib/approvedRole";
 import connectDB from "@/lib/db";
 
 function escapeRegex(value) {
@@ -40,26 +40,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     async signIn({ user, account, profile }) {
-
-      // =*=*=*=*=*=*=*=*=*=* PROVIDERS LINKING LOGIC (DON'T DELETE) =*=*=*=*=*=*=*=*=*=*
-
-      // if (account?.provider === "google") {
-      //   const { db } = await connectDB();
-
-      //   const existing = await db.collection("credentials").findOne({ email: user.email });
-
-      //   const isCredentialsOnly = existing?.providers?.length === 1 && existing.providers[0] === "credentials";
-      //   const isGoogleOnly = existing?.providers?.length === 1 && existing.providers[0] === "google";
-
-      //   if (isCredentialsOnly) {
-      //     return `/login?email=${encodeURIComponent(user.email)}&provider=google`;
-      //   }
-
-      //   if (isGoogleOnly) {
-      //     return `/home?email=${encodeURIComponent(user.email)}&provider=credentials`;
-      //   }
-        
-      // }
       return true;
     },
 
@@ -101,15 +81,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               };
             }
             
-            // =*=*=*=*=*=*=*=*=*=* PROVIDERS LINKING LOGIC (DON'T DELETE) =*=*=*=*=*=*=*=*=*=*
-
-            // if ( existingUser.providers?.length === 1 && existingUser.providers[0] === "credentials") {
-            //   token._linkingRequired = true;
-            //   token._linkingEmail = user.email;
-            //   token._linkingProvider = "google";
-              
-            //   return token;
-            // }
           } else {
             // new user
             const defaultImage = process.env.DEFAULT_USER_IMAGE;

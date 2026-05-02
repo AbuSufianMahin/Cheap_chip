@@ -24,12 +24,7 @@ export async function apiCall(endpoint, options = {}) {
   };
 
   try {
-    console.log(`[API] ${mergedOptions.method} ${url}`);
-    
     const response = await fetch(url, mergedOptions);
-    
-    // Log response status
-    console.log(`[API] Response Status: ${response.status}`);
 
     // Check if response is ok
     if (!response.ok) {
@@ -48,7 +43,6 @@ export async function apiCall(endpoint, options = {}) {
 
     // Parse response
     const data = await response.json();
-    console.log(`[API] Success:`, data);
     return data;
   } catch (error) {
     console.error(`[API] Error on ${endpoint}:`, error);
