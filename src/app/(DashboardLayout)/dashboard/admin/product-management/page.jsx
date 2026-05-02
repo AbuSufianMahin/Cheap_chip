@@ -54,7 +54,7 @@ function page() {
         </h1>
       </div>
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between mt-4 sm:mt-8">
-        <form className='sm:w-2/3 md:w-3/5 lg:w-3/7 xl:w-2/7' onChange={handleSubmit(handleSearch)}>
+        <form className='bg-white sm:w-2/3 md:w-3/5 lg:w-3/7 xl:w-2/7' onChange={handleSubmit(handleSearch)}>
           <Input
             placeholder="Search by product name"
             {...register('productName', {
@@ -70,6 +70,7 @@ function page() {
         </form>
         <div className='flex items-center gap-2'>
           <Checkbox
+            className={"bg-white"}
             id="unassigned"
             checked={onlyUnassigned}
             onCheckedChange={(checked) => setOnlyUnassigned(checked === true)}
