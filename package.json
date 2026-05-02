@@ -1,5 +1,5 @@
 {
-  "name": "cheap_chip",
+  "name": "cheap_chip_frontend",
   "version": "0.1.0",
   "private": true,
   "overrides": {
@@ -9,8 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "server": "nodemon server/server.js"
+    "lint": "eslint"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^6.2.0",
@@ -18,18 +17,14 @@
     "@tanstack/react-query": "^5.96.2",
     "@tanstack/react-query-devtools": "^5.96.2",
     "axios": "^1.14.0",
-    "bcrypt": "^6.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.3.2",
+    "groq-sdk": "^1.1.2",
     "lodash": "^4.18.1",
     "lottie-react": "^2.4.1",
     "lucide-react": "^1.8.0",
     "maplibre-gl": "^5.24.0",
-    "mongodb": "^7.1.0",
+    "mongodb": "^7.2.0",
     "next": "^16.2.2",
     "next-auth": "^5.0.0-beta.30",
     "radix-ui": "^1.4.3",
@@ -40,14 +35,12 @@
     "react-icons": "^5.6.0",
     "recharts": "^3.8.0",
     "sonner": "^2.0.7",
-    "stripe": "^22.1.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
-    "nodemon": "^3.1.14",
+    "eslint-config-next": "^16.2.2",
     "shadcn": "^3.8.4",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.4.0"

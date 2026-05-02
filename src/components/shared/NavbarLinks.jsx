@@ -30,6 +30,10 @@ function NavbarLinks() {
           ],
         },
         {
+          name: "Repair Product",
+          path: "/our-services/repair-product",
+        },
+        {
           name: "Recycling",
           path: "/our-services/recycling",
           children: [

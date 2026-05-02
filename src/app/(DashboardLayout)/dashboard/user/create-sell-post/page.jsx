@@ -142,7 +142,7 @@ function OurServices() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-linear-to-br from-white via-green-50 to-green-100 py-12 px-4">
+    <div className="min-h-screen w-full py-12 px-4">
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -z-10"></div>
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -z-10"></div>

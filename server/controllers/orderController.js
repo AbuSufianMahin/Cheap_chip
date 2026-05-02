@@ -259,13 +259,27 @@ const supportSearchOrders = async (req, res) => {
     let products = [];
 
     if (trimmedProductId) {
-      if (!ObjectId.isValid(trimmedProductId)) {
-        return res.status(400).json({ message: "Invalid productId format" });
+      // Try multiple query formats for flexibility
+      const queryOptions = [];
+
+      if (ObjectId.isValid(trimmedProductId)) {
+        queryOptions.push({ _id: new ObjectId(trimmedProductId) });
       }
 
+      // Also try tracking ID
+      queryOptions.push({ trackingId: trimmedProductId });
+      queryOptions.push({ trackingId: String(trimmedProductId) });
+
+      // Try numeric tracking ID
+      const numericId = Number(trimmedProductId);
+      if (!Number.isNaN(numericId)) {
+        queryOptions.push({ trackingId: numericId });
+      }
+
+      // Search with any matching format
       const product = await db
         .collection("products")
-        .findOne({ _id: new ObjectId(trimmedProductId) });
+        .findOne({ $or: queryOptions });
 
       if (product) {
         products = [product];

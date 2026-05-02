@@ -7,6 +7,7 @@ const APPLICATION_COLLECTIONS = {
 };
 
 const DELIVERYMEN_INFO_COLLECTION = "deliveryman-info";
+const TECHNICIAN_INFO_COLLECTION = "technician-info";
 
 const ALLOWED_APPLICATION_STATUSES = ["approved", "declined"];
 
@@ -65,6 +66,36 @@ const buildDeliverymanInfoDocument = (applicationInfo) => {
       averageDeliveryTime: 0,
     },
   }
+};
+
+const buildTechnicianInfoDocument = (applicationInfo) => {
+  return {
+    name: applicationInfo.name,
+    email: applicationInfo.email.trim().toLowerCase(),
+    phone: applicationInfo.mobileNumber,
+    location: applicationInfo.location || null,
+    skills: applicationInfo.skills || null,
+    certificates: applicationInfo.certificates || null,
+    isActive: true,
+    currentlyAssigned: [
+      // {
+      // productId: new ObjectId(),
+      // assignedAt: new Date(),
+      // }
+    ],
+    completedRepairs: [
+      // {
+      // productId: new ObjectId(),
+      // assignedAt: new Date(),
+      // completedAt: new Date(),
+      // }
+    ],
+    stats: {
+      totalAssigned: 0,
+      totalCompleted: 0,
+      totalRejected: 0,
+    },
+  };
 };
 
 const getAdminApplications = async (req, res) => {
@@ -137,18 +168,56 @@ const updateApplicationStatus = async (req, res) => {
       .collection(collectionName)
       .findOne({ _id: applicationObjectId });
 
-    if (
-      applicationType === "delivery" &&
-      status === "approved" &&
-      updatedApplication?.email
-    ) {
-      const { name, email, mobileNumber } = updatedApplication;
-      const deliverymanInfo = buildDeliverymanInfoDocument({ name, email, mobileNumber });
-      
-      await db.collection(DELIVERYMEN_INFO_COLLECTION).insertOne({
-        ...deliverymanInfo,
-        createdAt: reviewedAt,
-      });
+    if (status === "approved" && updatedApplication?.email) {
+      if (applicationType === "delivery") {
+        const { name, email, mobileNumber } = updatedApplication;
+        const deliverymanInfo = buildDeliverymanInfoDocument({
+          name,
+          email,
+          mobileNumber,
+        });
+
+        await db.collection(DELIVERYMEN_INFO_COLLECTION).updateOne(
+          { email: deliverymanInfo.email },
+          {
+            $set: {
+              ...deliverymanInfo,
+              updatedAt: reviewedAt,
+            },
+            $setOnInsert: {
+              createdAt: reviewedAt,
+            },
+          },
+          { upsert: true },
+        );
+      }
+
+      if (applicationType === "technician") {
+        const { name, email, mobileNumber, location, skills, certificates } =
+          updatedApplication;
+        const technicianInfo = buildTechnicianInfoDocument({
+          name,
+          email,
+          mobileNumber,
+          location,
+          skills,
+          certificates,
+        });
+
+        await db.collection(TECHNICIAN_INFO_COLLECTION).updateOne(
+          { email: technicianInfo.email },
+          {
+            $set: {
+              ...technicianInfo,
+              updatedAt: reviewedAt,
+            },
+            $setOnInsert: {
+              createdAt: reviewedAt,
+            },
+          },
+          { upsert: true },
+        );
+      }
     }
 
     return res.status(200).json({

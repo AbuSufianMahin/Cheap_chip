@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import connectDB from "./server/utils/db";
 import getApprovedRoleForEmail from "./server/utils/approvedRole";
+import connectDB from "@/lib/db";
 
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

@@ -2,6 +2,7 @@ const { ObjectId } = require("mongodb");
 const connectDB = require("../utils/db");
 
 const TECHNICIAN_APPLICATIONS_COLLECTION = "technicianApplications";
+const TECHNICIAN_INFO_COLLECTION = "technician-info";
 const USERS_COLLECTION = "users";
 const PRODUCTS_COLLECTION = "products";
 const FINAL_TECHNICIAN_STATUSES = ["repaired", "can't be repaired"];
@@ -23,6 +24,22 @@ async function getApprovedTechnicianByEmail(db, email, session) {
 
   if (!normalizedEmail) {
     return null;
+  }
+
+  const fromTechnicianInfoCollection = await db
+    .collection(TECHNICIAN_INFO_COLLECTION)
+    .findOne(
+      {
+        email: {
+          $regex: new RegExp(`^${escapeRegex(normalizedEmail)}$`, "i"),
+        },
+        isActive: true,
+      },
+      session ? { session } : undefined,
+    );
+
+  if (fromTechnicianInfoCollection) {
+    return fromTechnicianInfoCollection;
   }
 
   const fromUsersCollection = await db.collection(USERS_COLLECTION).findOne(
@@ -112,16 +129,50 @@ const getAvailableTechnicians = async (req, res) => {
   try {
     const { db } = await connectDB();
 
-    const approvedTechnicians = await db
-      .collection(USERS_COLLECTION)
-      .find({ role: "technician" })
+    let approvedTechnicians = await db
+      .collection(TECHNICIAN_INFO_COLLECTION)
+      .find({ isActive: true })
       .project({
         _id: 1,
         name: 1,
         email: 1,
         image: 1,
+        phone: 1,
+        skills: 1,
+        location: 1,
       })
       .toArray();
+
+    if (!approvedTechnicians.length) {
+      approvedTechnicians = await db
+        .collection(USERS_COLLECTION)
+        .find({ role: { $regex: /^technician$/i } })
+        .project({
+          _id: 1,
+          name: 1,
+          email: 1,
+          image: 1,
+          mobileNumber: 1,
+          skills: 1,
+          location: 1,
+        })
+        .toArray();
+    }
+
+    if (!approvedTechnicians.length) {
+      approvedTechnicians = await db
+        .collection(TECHNICIAN_APPLICATIONS_COLLECTION)
+        .find({ status: "approved" })
+        .project({
+          _id: 1,
+          name: 1,
+          email: 1,
+          mobileNumber: 1,
+          skills: 1,
+          location: 1,
+        })
+        .toArray();
+    }
 
     if (!approvedTechnicians.length) {
       return res.status(200).json([]);
@@ -160,7 +211,7 @@ const getAvailableTechnicians = async (req, res) => {
       return {
         ...technician,
         activeAssignments,
-        mobileNumber: technician.mobileNumber || null,
+        mobileNumber: technician.phone || technician.mobileNumber || null,
         skills: technician.skills || null,
         location: technician.location || null,
       };
@@ -202,15 +253,26 @@ const assignTechnicianToProduct = async (req, res) => {
     const now = new Date();
 
     await session.withTransaction(async () => {
+      const technicianFromTechnicianInfo = await db
+        .collection(TECHNICIAN_INFO_COLLECTION)
+        .findOne(
+          {
+            _id: technicianObjId,
+            isActive: true,
+          },
+          { session },
+        );
+
       const technicianFromUsers = await db.collection(USERS_COLLECTION).findOne(
         {
           _id: technicianObjId,
-          role: "technician",
+          role: { $regex: /^technician$/i },
         },
         { session },
       );
 
       const technician =
+        technicianFromTechnicianInfo ||
         technicianFromUsers ||
         (await db.collection(TECHNICIAN_APPLICATIONS_COLLECTION).findOne(
           {
@@ -225,6 +287,10 @@ const assignTechnicianToProduct = async (req, res) => {
           status: 404,
         });
       }
+
+      const technicianCollectionName = technicianFromTechnicianInfo
+        ? TECHNICIAN_INFO_COLLECTION
+        : null;
 
       const product = await db
         .collection(PRODUCTS_COLLECTION)
@@ -261,6 +327,24 @@ const assignTechnicianToProduct = async (req, res) => {
         },
         { session },
       );
+
+      if (technicianCollectionName) {
+        await db.collection(technicianCollectionName).updateOne(
+          { _id: technicianObjId },
+          {
+            $push: {
+              currentlyAssigned: {
+                productId: productObjId,
+                assignedAt: now,
+              },
+            },
+            $inc: {
+              "stats.totalAssigned": 1,
+            },
+          },
+          { session },
+        );
+      }
     });
 
     return res
@@ -357,6 +441,27 @@ const updateTechnicianStatus = async (req, res) => {
               updatedByEmail: normalizedEmail,
               updatedAt: now,
             },
+          },
+        },
+        { session },
+      );
+
+      await db.collection(TECHNICIAN_INFO_COLLECTION).updateOne(
+        { email: normalizedEmail, isActive: true },
+        {
+          $pull: {
+            currentlyAssigned: { productId: productObjId },
+          },
+          $push: {
+            completedRepairs: {
+              productId: productObjId,
+              completedAt: now,
+              result: normalizedStatus,
+            },
+          },
+          $inc: {
+            "stats.totalCompleted": 1,
+            "stats.totalRejected": normalizedStatus === "can't be repaired" ? 1 : 0,
           },
         },
         { session },

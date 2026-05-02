@@ -6,33 +6,34 @@ const cors = require("cors");
 const connectDB = require("./utils/db");
 const rateLimit = require("express-rate-limit");
 
-const port = process.env.SERVER_PORT || 5000;
+const port = process.env.SERVER_PORT || 5001;
 const app = express();
 
 const cooldownMinutes = Number.parseInt(process.env.COOLDOWN_MIN, 10);
 const hitLimitCount = Number.parseInt(process.env.HIT_LIMIT_COUNT, 10);
-const windowMs = Number.isFinite(cooldownMinutes) && cooldownMinutes > 0
-  ? cooldownMinutes * 60 * 1000
-  : 15 * 60 * 1000;
-const maxHits = Number.isFinite(hitLimitCount) && hitLimitCount > 0 ? hitLimitCount : 100;
+const windowMs =
+  Number.isFinite(cooldownMinutes) && cooldownMinutes > 0
+    ? cooldownMinutes * 60 * 1000
+    : 15 * 60 * 1000;
+const maxHits =
+  Number.isFinite(hitLimitCount) && hitLimitCount > 0 ? hitLimitCount : 100;
 
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
-// MongoDB connection
 connectDB();
 
 // CORS configuration (must run before body parsing so errors still include CORS headers)
 const corsOptions = {
   origin: [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:3001',
-    process.env.FRONTEND_URL || 'http://localhost:3000'
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    process.env.FRONTEND_URL || "http://localhost:3000",
   ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
@@ -46,23 +47,26 @@ const spamController = rateLimit({
   max: maxHits,
   message: {
     message: `Too many registration attempts. Please wait before your next attempt.`,
-    code: "TOO_MANY_REQUESTS"
+    code: "TOO_MANY_REQUESTS",
   },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-app.use("/api/statistics", require("./routes/platformOverview"))
+app.use("/api/statistics", require("./routes/platformOverview"));
 
 // routes
-app.use("/api/authentication", spamController, require("./routes/authentication"));
+app.use(
+  "/api/authentication",
+  spamController,
+  require("./routes/authentication"),
+);
 
 // riders (deliveryman) apis
 app.use("/api/riders-overview", require("./routes/ridersOverview"));
 
-app.use("/api/deliverymen", require("./routes/deliveryman"))
+app.use("/api/deliverymen", require("./routes/deliveryman"));
 app.use("/api/technicians", require("./routes/technician"));
-
 
 // product apis
 app.use("/api/product-lifecycle", require("./routes/productLifecycle"));
@@ -71,12 +75,13 @@ app.use("/api/admin", require("./routes/adminApplications"));
 app.use("/api/products-info", require("./routes/allProducts"));
 
 // Job application apis
-app.use('/api/job-applications', require("./routes/jobapplication"));
+app.use("/api/job-applications", require("./routes/jobapplication"));
 
 // employee apis
-app.use("/api/employees", require("./routes/employee"))
-app.use("/api", require("./routes/employee"))
+app.use("/api/employees", require("./routes/employee"));
+app.use("/api", require("./routes/employee"));
 
+app.use("/api/repair-requests", require("./routes/repairRequest"));
 
 app.get("/", (req, res) => {
   res.send("Running cheap chip server!");

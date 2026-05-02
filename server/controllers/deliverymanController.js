@@ -3,6 +3,8 @@ const { randomUUID } = require("crypto");
 const connectDB = require("../utils/db");
 
 const DELIVERYMEN_INFO_COLLECTION = "deliveryman-info";
+const DELIVERYMAN_APPLICATIONS_COLLECTION = "deliverymanApplications";
+const USERS_COLLECTION = "users";
 const PRODUCTS_COLLECTION = "products";
 const DELIVERY_TIME_TARGET = 20;
 const MAPTILER_GEOCODING_BASE = "https://api.maptiler.com/geocoding";
@@ -17,6 +19,8 @@ const ALLOWED_DELIVERY_STATUSES = [
   "delivered",
   "in Store house",
 ];
+
+const MAX_ACTIVE_DELIVERIES = 5;
 
 function normalizeEmail(value) {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -193,26 +197,75 @@ const getAvailableDeliverymen = async (req, res) => {
   try {
     const { db } = await connectDB();
 
-    const MAX_ACTIVE_DELIVERIES = 5;
-
     const query = {
       isActive: true,
-      $expr: { $lt: [{ $size: "$currentlyAssigned" }, MAX_ACTIVE_DELIVERIES] },
+      $expr: {
+        $lt: [{ $size: { $ifNull: ["$currentlyAssigned", []] } }, MAX_ACTIVE_DELIVERIES],
+      },
     };
 
     let availableDeliverymen = await db
       .collection(DELIVERYMEN_INFO_COLLECTION)
       .find(query)
+      .project({
+        _id: 1,
+        name: 1,
+        email: 1,
+        phone: 1,
+        image: 1,
+        isActive: 1,
+        currentlyAssigned: 1,
+        completedDeliveries: 1,
+        stats: 1,
+      })
       .toArray();
 
     if (!availableDeliverymen.length) {
       availableDeliverymen = await db
-        .collection(DELIVERYMEN_INFO_COLLECTION)
-        .find(query)
+        .collection(USERS_COLLECTION)
+        .find({ role: { $regex: /^deliveryman$/i } })
+        .project({
+          _id: 1,
+          name: 1,
+          email: 1,
+          phone: "$mobileNumber",
+          image: 1,
+        })
         .toArray();
     }
 
-    res.status(200).json(availableDeliverymen);
+    if (!availableDeliverymen.length) {
+      availableDeliverymen = await db
+        .collection(DELIVERYMAN_APPLICATIONS_COLLECTION)
+        .find({ status: "approved" })
+        .project({
+          _id: 1,
+          name: 1,
+          email: 1,
+          phone: "$mobileNumber",
+        })
+        .toArray();
+    }
+
+    const normalizedResponse = availableDeliverymen.map((deliveryman) => ({
+      ...deliveryman,
+      currentlyAssigned: Array.isArray(deliveryman.currentlyAssigned)
+        ? deliveryman.currentlyAssigned
+        : [],
+      completedDeliveries: Array.isArray(deliveryman.completedDeliveries)
+        ? deliveryman.completedDeliveries
+        : [],
+      stats: {
+        totalAssigned: 0,
+        totalCompleted: 0,
+        totalCancelled: 0,
+        moneyCollected: 0,
+        averageDeliveryTime: 0,
+        ...(deliveryman.stats || {}),
+      },
+    }));
+
+    res.status(200).json(normalizedResponse);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -287,22 +340,63 @@ const assignDeliverymanToProduct = async (req, res) => {
     const now = new Date();
 
     await session.withTransaction(async () => {
-      const deliverymanFromNewCollection = await db
+      const deliverymanFromInfoCollection = await db
         .collection(DELIVERYMEN_INFO_COLLECTION)
         .findOne({ _id: deliverymanObjId, isActive: true }, { session });
 
-      const deliveryCollectionName = deliverymanFromNewCollection
-        ? DELIVERYMEN_INFO_COLLECTION
-        : DELIVERYMEN_INFO_COLLECTION;
+      const deliverymanFromUsersCollection = await db
+        .collection(USERS_COLLECTION)
+        .findOne({ _id: deliverymanObjId, role: { $regex: /^deliveryman$/i } }, { session });
+
+      const deliverymanFromApplicationsCollection = await db
+        .collection(DELIVERYMAN_APPLICATIONS_COLLECTION)
+        .findOne({ _id: deliverymanObjId, status: "approved" }, { session });
 
       const deliveryman =
-        deliverymanFromNewCollection ||
-        (await db
-          .collection(DELIVERYMEN_INFO_COLLECTION)
-          .findOne({ _id: deliverymanObjId, isActive: true }, { session }));
+        deliverymanFromInfoCollection ||
+        deliverymanFromUsersCollection ||
+        deliverymanFromApplicationsCollection;
 
       if (!deliveryman) {
         throw Object.assign(new Error("Deliveryman not found or inactive"), {
+          status: 404,
+        });
+      }
+
+      const normalizedDeliverymanEmail = normalizeEmail(deliveryman.email);
+
+      await db.collection(DELIVERYMEN_INFO_COLLECTION).updateOne(
+        { email: normalizedDeliverymanEmail },
+        {
+          $set: {
+            name: deliveryman.name,
+            email: normalizedDeliverymanEmail,
+            phone: deliveryman.phone || deliveryman.mobileNumber || null,
+            isActive: true,
+            updatedAt: now,
+          },
+          $setOnInsert: {
+            currentlyAssigned: [],
+            completedDeliveries: [],
+            stats: {
+              totalAssigned: 0,
+              totalCompleted: 0,
+              totalCancelled: 0,
+              moneyCollected: 0,
+              averageDeliveryTime: 0,
+            },
+            createdAt: now,
+          },
+        },
+        { upsert: true, session },
+      );
+
+      const persistedDeliveryman = await db
+        .collection(DELIVERYMEN_INFO_COLLECTION)
+        .findOne({ email: normalizedDeliverymanEmail }, { session });
+
+      if (!persistedDeliveryman?._id) {
+        throw Object.assign(new Error("Deliveryman profile not found"), {
           status: 404,
         });
       }
@@ -320,8 +414,8 @@ const assignDeliverymanToProduct = async (req, res) => {
         );
       }
 
-      await db.collection(deliveryCollectionName).updateOne(
-        { _id: deliverymanObjId },
+      await db.collection(DELIVERYMEN_INFO_COLLECTION).updateOne(
+        { _id: persistedDeliveryman._id },
         {
           $push: {
             currentlyAssigned: { orderId: productObjId, assignedAt: now },
@@ -335,7 +429,7 @@ const assignDeliverymanToProduct = async (req, res) => {
         { _id: productObjId },
         {
           $set: {
-            assignedDeliveryman: deliverymanObjId,
+            assignedDeliveryman: persistedDeliveryman._id,
             current_status: "assigned",
             "activity_log.assignedAt": now,
           },

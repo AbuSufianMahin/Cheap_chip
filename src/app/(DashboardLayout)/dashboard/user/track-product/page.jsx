@@ -8,6 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Clock, Truck, Package, AlertCircle, Search, RefreshCw } from 'lucide-react';
+import OrderChatbot from '@/components/shared/OrderChatbot';
+import { toast } from 'sonner';
+import axiosPublic from '@/lib/axiosPublic';
 
 function TrackProduct() {
   const searchParams = useSearchParams();
@@ -58,7 +61,7 @@ function TrackProduct() {
 
   const handleTrack = async (id = orderId) => {
     if (!id.trim()) {
-      setError('Please enter an order ID');
+      setError('Please enter an order ID or 6-digit repair tracking ID');
       return;
     }
 
@@ -66,24 +69,46 @@ function TrackProduct() {
     setError('');
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
-      console.log('[TrackOrder] Fetching from:', `${apiUrl}/api/orders/track/${id}`);
-      
-      const response = await fetch(`${apiUrl}/api/orders/track/${id}`);
-      console.log('[TrackOrder] Response status:', response.status);
-      
-      const data = await response.json();
-      console.log('[TrackOrder] Response data:', data);
+      // Check if it's a 6-digit repair tracking ID
+      const cleanId = id.trim();
+      const isRepairId = /^\d{6}$/.test(cleanId);
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Order not found');
+      if (isRepairId) {
+        // Try repair tracking first
+        console.log('[TrackRepair] Fetching repair with tracking ID:', cleanId);
+        try {
+          const repairResponse = await axiosPublic.get(`/api/repair-requests?trackingId=${cleanId}`);
+          const repairData = repairResponse.data;
+          console.log('[TrackRepair] Response:', repairData);
+
+          if (repairData.data) {
+            setOrderData({
+              type: 'repair',
+              ...repairData.data,
+            });
+            setLastUpdated(new Date());
+            return;
+          }
+        } catch (repairError) {
+          console.log('[TrackRepair] Repair not found, falling back to order tracking');
+        }
       }
 
-      setOrderData(data);
+      // Fall back to product order tracking
+      console.log('[TrackOrder] Fetching order:', cleanId);
+
+      const response = await axiosPublic.get(`/api/orders/track/${cleanId}`);
+      const data = response.data;
+      console.log('[TrackOrder] Response data:', data);
+
+      setOrderData({
+        type: 'order',
+        ...data,
+      });
       setLastUpdated(new Date());
     } catch (err) {
-      console.error('[TrackOrder] Error:', err);
-      setError(err.message || 'Failed to fetch order. Make sure the backend server is running at ' + (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001'));
+      console.error('[Track] Error:', err);
+      setError(err.message || 'Failed to fetch tracking info. Check your order ID or repair tracking ID.');
       setOrderData(null);
     } finally {
       setLoading(false);
@@ -107,7 +132,6 @@ function TrackProduct() {
     setSupportResults([]);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
       const params = new URLSearchParams();
 
       if (supportForm.productId.trim()) {
@@ -118,12 +142,8 @@ function TrackProduct() {
         params.set('productCondition', supportForm.productCondition.trim());
       }
 
-      const response = await fetch(`${apiUrl}/api/orders/support/search?${params.toString()}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'No matching product found');
-      }
+      const response = await axiosPublic.get(`/api/orders/support/search?${params.toString()}`);
+      const data = response.data;
 
       setSupportResults(data.results || []);
       if (!data.results?.length) {
@@ -177,7 +197,7 @@ function TrackProduct() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-white via-green-50 to-emerald-100 py-12 px-4">
+    <div className="min-h-screen px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -186,10 +206,10 @@ function TrackProduct() {
             Track Your Order
           </div>
           <h1 className="text-4xl font-bold mb-4 bg-linear-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-            Track Your Computer Chip Order
+            Track Your Order or Repair
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Enter your order ID below to get real-time updates on your computer chip purchase status
+            Enter your Order ID or 6-digit Repair Tracking ID to get real-time updates
           </p>
         </div>
 
@@ -198,19 +218,19 @@ function TrackProduct() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="w-5 h-5" />
-              Track Your Order
+              Track Order or Repair
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="orderId" className="text-lg font-semibold">
-                  Order / Tracking ID
+                  Order ID or 6-Digit Repair Tracking ID
                 </Label>
                 <Input
                   id="orderId"
                   type="text"
-                  placeholder="Enter Order ID or Tracking ID (e.g., ORD-123456 or 32200)"
+                  placeholder="e.g., ORD-123456 or 456789"
                   value={orderId}
                   onChange={(e) => setOrderId(e.target.value)}
                   className="mt-2 text-lg"
@@ -220,7 +240,7 @@ function TrackProduct() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-linear-to-rrom-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg"
+                  className="flex-1 py-3 text-lg"
                 >
                   {loading ? 'Tracking...' : 'Track Order'}
                 </Button>
@@ -257,8 +277,95 @@ function TrackProduct() {
           </CardContent>
         </Card>
 
+        {/* Order/Repair Details */}
+        {orderData && orderData.type === 'repair' && (
+          <div className="space-y-6">
+            {/* Repair Summary */}
+            <Card className="shadow-lg border-orange-200">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="font-mono text-2xl">{orderData.trackingId}</span>
+                  <Badge className={orderData.status === 'submitted' ? 'bg-blue-100 text-blue-800' : orderData.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}>
+                    {orderData.status?.charAt(0).toUpperCase() + orderData.status?.slice(1)}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="font-semibold text-gray-700 mb-2">CPU Details</h3>
+                    <p className="text-lg font-medium">{orderData.productType}</p>
+                    {orderData.productModel && orderData.productModel !== 'Not specified' && (
+                      <p className="text-gray-600">Model: {orderData.productModel}</p>
+                    )}
+                    <p className="text-gray-600">Condition: {orderData.condition}</p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-700 mb-2">Repair Information</h3>
+                    <p>Submitted: {new Date(orderData.createdAt).toLocaleDateString()}</p>
+                    <p>Est. Cost: {orderData.estimatedPrice?.toLocaleString()} ৳</p>
+                    <p>Est. Days: {orderData.estimatedDays} days</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Problems */}
+            <Card className="shadow-lg border-orange-200 bg-orange-50">
+              <CardHeader>
+                <CardTitle>Problems Reported</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {orderData.problems?.map((problem, idx) => (
+                    <Badge key={idx} variant="secondary" className="bg-orange-200 text-orange-900">
+                      {problem}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Status Timeline */}
+            <Card className="shadow-lg border-orange-200">
+              <CardHeader>
+                <CardTitle>Repair Timeline</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {orderData.statusHistory && orderData.statusHistory.length > 0 ? (
+                    orderData.statusHistory.map((step, index) => (
+                      <div key={index} className="flex items-start gap-4">
+                        <div className="shrink-0 mt-1">
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-gray-800">
+                              {step.status?.charAt(0).toUpperCase() + step.status?.slice(1)}
+                            </h4>
+                            <span className="text-sm text-gray-500">
+                              {new Date(step.timestamp).toLocaleString()}
+                            </span>
+                          </div>
+                          {step.message && <p className="text-gray-600 mt-1">{step.message}</p>}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No tracking updates yet</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Order Details */}
-        {orderData && (
+        {orderData && orderData.type === 'order' && (
           <div className="space-y-6">
             {/* Order Summary */}
             <Card className="shadow-lg border-green-200">
@@ -311,11 +418,11 @@ function TrackProduct() {
                       </div>
                     </div>
                   )) || (
-                    <div className="text-center py-8 text-gray-500">
-                      <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>No tracking information available yet</p>
-                    </div>
-                  )}
+                      <div className="text-center py-8 text-gray-500">
+                        <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>No tracking information available yet</p>
+                      </div>
+                    )}
                 </div>
               </CardContent>
             </Card>
@@ -339,10 +446,10 @@ function TrackProduct() {
                     {orderData.status === 'delivered'
                       ? '✓ Your order has been successfully delivered!'
                       : orderData.status === 'shipped'
-                      ? '🚚 Your order is on the way'
-                      : orderData.status === 'processing'
-                      ? '⚙️ Your order is being prepared'
-                      : '📦 Your order is being processed. We\'ll keep you updated.'}
+                        ? '🚚 Your order is on the way'
+                        : orderData.status === 'processing'
+                          ? '⚙️ Your order is being prepared'
+                          : '📦 Your order is being processed. We\'ll keep you updated.'}
                   </p>
                 </div>
               </CardContent>

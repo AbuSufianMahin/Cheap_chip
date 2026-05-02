@@ -1,5 +1,6 @@
 "use client";
 
+import axiosPublic from "@/lib/axiosPublic";
 import { useEffect, useState } from "react";
 
 const FILTERS = ["all", "technician", "delivery", "pending", "approved", "declined"];
@@ -85,10 +86,10 @@ function AdminApplicationsPage() {
       setLoading(true);
       setError("");
 
-      const response = await fetch("/api/admin/job-applications");
-      const payload = await response.json();
+      const response = await axiosPublic.get("/api/admin/job-applications");
+      const payload = await response.data;
 
-      if (!response.ok) {
+      if (!response.status) {
         throw new Error(payload.message || "Failed to load applications");
       }
 

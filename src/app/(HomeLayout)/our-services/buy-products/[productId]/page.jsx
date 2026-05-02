@@ -75,7 +75,7 @@ function ProductDetails() {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 flex items-center justify-center py-12 px-4">
+			<div className="min-h-screen bg-linear-to-br from-white via-blue-50 to-blue-100 flex items-center justify-center py-12 px-4">
 				<div className="text-center">
 					<Spinner className="w-12 h-12 mx-auto mb-4 text-blue-600" />
 					<p className="text-lg text-gray-600">Loading product details...</p>
@@ -86,7 +86,7 @@ function ProductDetails() {
 
 	if (error) {
 		return (
-			<div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 py-12 px-4">
+			<div className="min-h-screen bg-linear-to-br from-white via-blue-50 to-blue-100 py-12 px-4">
 				<div className="max-w-4xl mx-auto">
 					<Link href="/our-services/buy-products" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold mb-6 hover:underline">
 						<ArrowLeft className="w-5 h-5" />
@@ -95,7 +95,7 @@ function ProductDetails() {
 
 					<div className="bg-red-50 border-2 border-red-300 rounded-2xl p-8">
 						<div className="flex items-start gap-4">
-							<AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+							<AlertCircle className="w-6 h-6 text-red-600 shrink-0 mt-1" />
 							<div>
 								<h3 className="text-lg font-bold text-red-800 mb-2">Error Loading Product</h3>
 								<p className="text-red-700 mb-4">{error}</p>
@@ -113,7 +113,7 @@ function ProductDetails() {
 	if (!product) return null;
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-blue-100 py-12 px-4">
+		<div className="min-h-screen bg-linear-to-br from-white via-blue-50 to-blue-100 py-12 px-4">
 			<div className="max-w-6xl mx-auto">
 				<Link href="/our-services/buy-products" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold mb-8 hover:underline">
 					<ArrowLeft className="w-5 h-5" />
@@ -154,7 +154,7 @@ function ProductDetails() {
 						</div>
 
 						{product.productPrice && (
-							<div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
+							<div className="bg-linear-to-r from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
 								<p className="text-gray-600 text-sm mb-1">Price</p>
 								<p className="text-4xl font-bold text-blue-600">{product.productPrice}</p>
 							</div>
