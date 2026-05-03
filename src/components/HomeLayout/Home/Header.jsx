@@ -51,18 +51,11 @@ function Header() {
                                 <Link href={"/our-services"}>
                                     <Button
                                         size="lg"
-                                        className="gap-2 rounded-lg bg-green-500 px-6 font-semibold text-white hover:bg-green-600"
+                                        className="gap-2 rounded-lg bg-green-600 px-6 font-semibold text-white hover:bg-green-700"
                                     >
                                         Our services <ArrowRight className="h-4 w-4" />
                                     </Button>
                                 </Link>
-                                <Button
-                                    size="lg"
-                                    variant="ghost"
-                                    className="gap-2 rounded-lg font-medium text-muted-foreground hover:text-foreground"
-                                >
-                                    How recycling works <ArrowRight className="h-4 w-4" />
-                                </Button>
                             </div>
 
                             {/* Stats */}
