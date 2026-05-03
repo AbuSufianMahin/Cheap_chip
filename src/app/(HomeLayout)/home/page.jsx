@@ -1,9 +1,10 @@
+import Header from '@/components/HomeLayout/Home/Header'
 import React from 'react'
 
 function Home() {
   return (
     <>
-    <div>Home</div>
+      <Header />
     </>
   )
 }
